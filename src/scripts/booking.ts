@@ -147,7 +147,7 @@ export function initBooking({ lenis, onOpen }: { lenis?: Lenis; onOpen?: () => v
       bits.push(`${datesText()} · ${plural(n, "night", "nights")}`);
     }
     if (step > 1) bits.push(guestsText());
-    recap.innerHTML = bits.join(" · ") || "Three stays in Kochi. Pick one to begin.";
+    recap.innerHTML = bits.join(" · ") || "Choose a stay to begin.";
   }
 
   // ── Step 1: stay ─────────────────────────────────────────────────────────

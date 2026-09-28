@@ -15,8 +15,7 @@ const letters = "HOVATO".split("");
         <Logo />
         <p class="site-footer__tagline serif">Where better stays create <em>greater value.</em></p>
         <p class="site-footer__desc">
-          {site.descriptor} in {site.region}: serviced apartments in Manjummal, plus rooms and a private
-          apartment near Cochin International Airport.
+          {site.descriptor} in {site.region}. A growing collection of stays, each kept to one standard of care.
         </p>
       </div>
 
@@ -27,7 +26,7 @@ const letters = "HOVATO".split("");
             stays.map((s) => (
               <li>
                 <a class="link" href={`/stays/${s.slug}/`}>{s.name}</a>
-                <span class="site-footer__sub">{s.areaShort === "Airport" ? "Near COK airport" : s.area}</span>
+                <span class="site-footer__sub">{s.areaShort}</span>
               </li>
             ))
           }

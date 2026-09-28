@@ -10,7 +10,7 @@ export const site = {
   tagline: "Where better stays create greater value",
   region: "Kochi, Kerala",
   description:
-    "Hovato runs three stays in Kochi, Kerala: two-bedroom serviced apartments in Manjummal, plus attached rooms and a private service apartment near Cochin International Airport.",
+    "Hovato is a growing collection of stays in Kochi, Kerala, each with its own character and all kept to one standard of care. Book direct with a real host.",
 
   contact: {
     // TODO: real phone number. `display` is what visitors read, `tel` is what the phone dials.

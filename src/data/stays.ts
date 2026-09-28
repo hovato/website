@@ -56,8 +56,16 @@ export interface Stay {
   unit: { count: number; singular: string; plural: string };
   /** TODO: confirm how many guests each unit sleeps. */
   maxGuestsPerUnit: number;
+  /** Full location line, e.g. "Manjummal, Ernakulam". */
   area: string;
+  /** Short location label for chips and menus, e.g. "Near the airport". */
   areaShort: string;
+  /** Town or neighbourhood name, used for page titles and search engines. */
+  locality: string;
+  /** Short name used in headings, e.g. "Inside Halcyon". */
+  shortName: string;
+  /** schema.org type for search engines. */
+  schemaType: "LodgingBusiness" | "Hotel" | "Hostel" | "Resort" | "Apartment";
   airportTime: string;
   tagline: string;
   summary: string;
@@ -66,14 +74,21 @@ export interface Stay {
   facts: { label: string; value: string }[];
   highlights: { icon: string; title: string; text: string }[];
   amenities: { icon: string; label: string }[];
+  location: {
+    /** Heading on the stay page, the second part set in italics: ["In", "Manjummal."] */
+    heading: [string, string];
+    intro: string;
+    /** What to search for on Google Maps. TODO: use the exact address once confirmed. */
+    mapsQuery: string;
+  };
   nearby: { place: string; time: string }[];
   faqs: { q: string; a: string }[];
   theme: { accent: string; tint: string; deep: string };
   hero: Photo;
   cardDetail: Photo;
   gallery: Photo[];
-  /** Position on the illustrated Kochi map (see MapKochi.astro). */
-  pin: { x: number; y: number };
+  /** Position on the illustrated Kochi map (see MapKochi.astro), and where its name label sits. */
+  pin: { x: number; y: number; label: "left" | "right" | "below-left" | "below-right" };
   /** Route to the airport drawn on the map. */
   route: string;
 }
@@ -83,6 +98,9 @@ const idAtCheckIn = {
   a: "A government-issued photo ID for every adult guest. Guests from outside India need their passport and visa, as Indian law requires us to register foreign nationals.",
 };
 
+// To add a new property: copy one entry below, give it a new slug, photos and
+// map pin, and add the slug to the StaySlug type. The home page, menus, booking
+// drawer, map, footer, sitemap and its own /stays/<slug>/ page all pick it up.
 export const stays: Stay[] = [
   {
     slug: "halcyon-suites",
@@ -95,6 +113,9 @@ export const stays: Stay[] = [
     maxGuestsPerUnit: 4,
     area: "Manjummal, Ernakulam",
     areaShort: "Manjummal",
+    locality: "Manjummal",
+    shortName: "Halcyon",
+    schemaType: "LodgingBusiness",
     airportTime: "About 40 min to the airport",
     tagline: "Two-bedroom apartments with room to breathe.",
     summary:
@@ -133,6 +154,11 @@ export const stays: Stay[] = [
       { icon: "laptop", label: "Space to work" },
     ],
     // TODO: travel times are approximate road times and should be checked.
+    location: {
+      heading: ["In", "Manjummal."],
+      intro: "A residential pocket on the Periyar side of the city, close to Kalamassery, Eloor and the highway to Aluva and Edappally.",
+      mapsQuery: "Manjummal, Ernakulam",
+    },
     nearby: [
       { place: "Kalamassery", time: "10 min" },
       { place: "Edappally & Lulu Mall", time: "20 min" },
@@ -169,7 +195,7 @@ export const stays: Stay[] = [
       { src: halcyonBath, alt: "Bathroom with a stone basin and a walk-in shower" },
       { src: backwatersMist, alt: "Morning mist over the backwaters near Kochi" },
     ],
-    pin: { x: 299, y: 293 },
+    pin: { x: 299, y: 293, label: "left" },
     route: "M299 293 C 312 304, 322 318, 333 327 C 352 290, 372 256, 391 226 C 408 204, 432 172, 466 147",
   },
   {
@@ -182,7 +208,10 @@ export const stays: Stay[] = [
     unit: { count: 13, singular: "room", plural: "rooms" },
     maxGuestsPerUnit: 2,
     area: "Near Cochin International Airport",
-    areaShort: "Airport",
+    areaShort: "Near the airport",
+    locality: "Nedumbassery",
+    shortName: "Stayora",
+    schemaType: "Hotel",
     airportTime: "Minutes from the airport",
     tagline: "Easy rooms, minutes from the terminal.",
     summary:
@@ -220,6 +249,11 @@ export const stays: Stay[] = [
       { icon: "square-parking", label: "Parking" },
       { icon: "sparkles", label: "Daily housekeeping" },
     ],
+    location: {
+      heading: ["By the", "airport."],
+      intro: "A short drive from Cochin International Airport, with Aluva, Kalady and Angamaly close by. Good for early departures and late arrivals.",
+      mapsQuery: "Cochin International Airport",
+    },
     nearby: [
       { place: "Cochin International Airport", time: "10 min" },
       { place: "Kalady", time: "20 min" },
@@ -256,7 +290,7 @@ export const stays: Stay[] = [
       { src: stayoraPillows, alt: "Patterned cushions on a crisp white bed" },
       { src: planeWindowSunset, alt: "Sunset seen from an aeroplane window" },
     ],
-    pin: { x: 447, y: 171 },
+    pin: { x: 447, y: 171, label: "below-left" },
     route: "M447 171 C 452 162, 459 153, 466 147",
   },
   {
@@ -269,7 +303,10 @@ export const stays: Stay[] = [
     unit: { count: 1, singular: "apartment", plural: "apartments" },
     maxGuestsPerUnit: 4,
     area: "Near Cochin International Airport",
-    areaShort: "Airport",
+    areaShort: "Near the airport",
+    locality: "Nedumbassery",
+    shortName: "Brown",
+    schemaType: "LodgingBusiness",
     airportTime: "Minutes from the airport",
     tagline: "One apartment. All yours.",
     summary:
@@ -307,6 +344,11 @@ export const stays: Stay[] = [
       { icon: "sparkles", label: "Housekeeping" },
       { icon: "square-parking", label: "Parking" },
     ],
+    location: {
+      heading: ["By the", "airport."],
+      intro: "A short drive from Cochin International Airport, with Aluva, Kalady and Angamaly close by. Easy for arrivals at any hour.",
+      mapsQuery: "Cochin International Airport",
+    },
     nearby: [
       { place: "Cochin International Airport", time: "10 min" },
       { place: "Kalady", time: "20 min" },
@@ -342,12 +384,12 @@ export const stays: Stay[] = [
       { src: brownBedroom3, alt: "Bedroom with timber panelling and a round mirror" },
       { src: brownMonsoon, alt: "Coffee on a windowsill while rain falls outside" },
     ],
-    pin: { x: 489, y: 167 },
+    pin: { x: 489, y: 167, label: "below-right" },
     route: "M489 167 C 482 160, 474 153, 466 147",
   },
 ];
 
 export const staysBySlug = Object.fromEntries(stays.map((s) => [s.slug, s])) as Record<StaySlug, Stay>;
 
-/** Total keys across the collection: 7 + 13 + 1. */
+/** Total apartments and rooms across every stay. */
 export const totalKeys = stays.reduce((n, s) => n + s.unit.count, 0);

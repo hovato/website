@@ -11,6 +11,15 @@ interface Props {
 }
 const { focus, class: className } = Astro.props;
 
+const description = stays.map((s) => `${s.name}: ${s.area}.`).join(" ");
+// Where each pin's name label sits relative to the pin.
+const tagPlacement = {
+  left: { dx: -18, dy: 4, anchor: "end" },
+  right: { dx: 18, dy: 4, anchor: "start" },
+  "below-left": { dx: -18, dy: 28, anchor: "end" },
+  "below-right": { dx: 18, dy: 28, anchor: "start" },
+} as const;
+
 const towns = [
   { name: "Angamaly", x: 455, y: 63, anchor: "start", dx: 9, dy: 4 },
   { name: "Kalady", x: 555, y: 115, anchor: "end", dx: -9, dy: 4 },
@@ -28,10 +37,7 @@ const towns = [
 <figure class:list={["kmap", className]} data-map data-map-focus={focus}>
   <svg viewBox="0 0 600 560" role="img" aria-labelledby="kmap-title kmap-desc">
     <title id="kmap-title">Illustrated map of Hovato stays around Kochi</title>
-    <desc id="kmap-desc">
-      H. Halcyon Suites is in Manjummal, north of Kalamassery. Bohom Stayora and Hovato Brown are close to Cochin
-      International Airport at Nedumbassery.
-    </desc>
+    <desc id="kmap-desc">{description}</desc>
 
     <defs>
       <pattern id="kmap-dots" width="9" height="9" patternUnits="userSpaceOnUse">
@@ -113,15 +119,14 @@ const towns = [
           <text class="kmap__pin-num" y="4" text-anchor="middle">
             {s.index}
           </text>
-          <g class="kmap__tag" transform={s.slug === "halcyon-suites" ? "translate(-18 0)" : s.slug === "bohom-stayora" ? "translate(-18 18)" : "translate(18 18)"}>
-            <text
-              class="kmap__tag-text"
-              text-anchor={s.slug === "hovato-brown" ? "start" : "end"}
-              y={s.slug === "halcyon-suites" ? 4 : 10}
-            >
-              {s.name}
-            </text>
-          </g>
+          <text
+            class="kmap__tag-text"
+            x={tagPlacement[s.pin.label].dx}
+            y={tagPlacement[s.pin.label].dy}
+            text-anchor={tagPlacement[s.pin.label].anchor}
+          >
+            {s.name}
+          </text>
         </g>
       ))
     }

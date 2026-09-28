@@ -1,13 +1,15 @@
 ---
 import { Picture } from "astro:assets";
-import { totalKeys } from "../data/stays";
+import { stays, totalKeys } from "../data/stays";
 import heritageDoor from "../assets/images/heritage-door.jpg";
 import kanikonna from "../assets/images/kanikonna.jpg";
 
+// Counted from the stay data, so these grow as Hovato does.
+const neighbourhoods = new Set(stays.map((s) => s.locality)).size;
 const stats = [
-  { value: 3, label: "Stays, each with its own character" },
+  { value: stays.length, label: "Stays, each with its own character" },
   { value: totalKeys, label: "Apartments & rooms across Kochi" },
-  { value: 2, label: "Neighbourhoods: Manjummal & the airport" },
+  { value: neighbourhoods, label: neighbourhoods === 1 ? "Neighbourhood in Kochi" : "Neighbourhoods across Kochi" },
   { value: 1, label: "Standard of care, everywhere" },
 ];
 ---
@@ -19,7 +21,7 @@ const stats = [
     </div>
 
     <p class="manifesto__text serif" data-scrub-text>
-      Hovato is a small family of stays in Kochi. Each one has its own character, and all are kept to one quiet
+      Hovato is a growing family of stays in Kochi. Each one has its own character, and all are kept to one quiet
       standard: <em>spotless rooms, honest prices</em> and a host who actually picks up the phone.
     </p>
 

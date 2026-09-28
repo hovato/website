@@ -1,11 +1,8 @@
 import type { ImageMetadata } from "astro";
-import type { StaySlug } from "./stays";
+import { stays, type StaySlug } from "./stays";
 import { site } from "./site";
 
 import kochiDawn from "../assets/images/kochi-dawn.jpg";
-import halcyonLiving from "../assets/images/halcyon-living.jpg";
-import stayoraTropical from "../assets/images/stayora-tropical.jpg";
-import brownBedroom from "../assets/images/brown-bedroom.jpg";
 
 import fortKochi from "../assets/images/nearby-fort-kochi.jpg";
 import mattancherry from "../assets/images/nearby-mattancherry.jpg";
@@ -14,11 +11,10 @@ import backwaters from "../assets/images/nearby-backwaters.jpg";
 import munnar from "../assets/images/nearby-munnar.jpg";
 import kathakali from "../assets/images/nearby-kathakali.jpg";
 
+// Opening image, then one slide per stay. New stays join the slideshow automatically.
 export const heroSlides: { src: ImageMetadata; alt: string; caption: string; position?: string }[] = [
   { src: kochiDawn, alt: "A Chinese fishing net at dawn on still water in Kochi", caption: "Kochi, Kerala", position: "50% 60%" },
-  { src: halcyonLiving, alt: "Sunlit living room with linen curtains and plants", caption: "H. Halcyon Suites · Manjummal", position: "50% 55%" },
-  { src: stayoraTropical, alt: "Bedroom with a wall of glass onto tropical plants", caption: "Bohom Stayora · Airport", position: "50% 60%" },
-  { src: brownBedroom, alt: "Wood-panelled bedroom with a curved sofa", caption: "Hovato Brown · Airport", position: "50% 60%" },
+  ...stays.map((s) => ({ src: s.hero.src, alt: s.hero.alt, caption: `${s.name} · ${s.areaShort}` })),
 ];
 
 /** "What brings you to Kochi?" — each occasion recommends one stay. */
@@ -61,7 +57,7 @@ export const occasions: { id: string; label: string; stay: StaySlug; reason: str
   },
 ];
 
-/** The Hovato standard. TODO: confirm each promise holds at all three stays. */
+/** The Hovato standard. TODO: confirm each promise holds at every stay. */
 export const standards: { icon: string; title: string; text: string }[] = [
   { icon: "sparkles", title: "Spotless, every stay", text: "Rooms cleaned to a hotel standard, with fresh linen and towels waiting." },
   { icon: "message-circle", title: "A host on call", text: "Real people on WhatsApp and phone, whether you land at noon or 3 am." },
@@ -76,7 +72,8 @@ export const nearby: {
   line: string;
   src: ImageMetadata;
   alt: string;
-  fromHalcyon: string;
+  /** Approximate drive times from two fixed landmarks, so they stay true as new stays open. */
+  fromCity: string;
   fromAirport: string;
 }[] = [
   {
@@ -84,7 +81,7 @@ export const nearby: {
     line: "Chinese fishing nets, colonial lanes and sunsets over the harbour.",
     src: fortKochi,
     alt: "A Chinese fishing net silhouetted against a pink sky",
-    fromHalcyon: "1 hr",
+    fromCity: "30 min",
     fromAirport: "1 hr 30",
   },
   {
@@ -92,7 +89,7 @@ export const nearby: {
     line: "Antique shops, spice warehouses and the Dutch Palace in Jew Town.",
     src: mattancherry,
     alt: "A quiet street lined with yellow heritage buildings",
-    fromHalcyon: "1 hr",
+    fromCity: "30 min",
     fromAirport: "1 hr 30",
   },
   {
@@ -100,7 +97,7 @@ export const nearby: {
     line: "Kerala's largest waterfall, a scenic morning's drive from the airport.",
     src: athirappilly,
     alt: "Athirappilly waterfall surrounded by forest",
-    fromHalcyon: "1 hr 45",
+    fromCity: "2 hr",
     fromAirport: "1 hr 15",
   },
   {
@@ -108,7 +105,7 @@ export const nearby: {
     line: "Houseboats and palm-lined canals, an easy day trip south to Alappuzha.",
     src: backwaters,
     alt: "A houseboat reflected in a palm-lined canal",
-    fromHalcyon: "2 hr",
+    fromCity: "1 hr 30",
     fromAirport: "2 hr 30",
   },
   {
@@ -116,7 +113,7 @@ export const nearby: {
     line: "Rolling tea estates in the Western Ghats. The classic weekend escape.",
     src: munnar,
     alt: "Tea plantations below a rocky peak in Munnar",
-    fromHalcyon: "3 hr 30",
+    fromCity: "4 hr",
     fromAirport: "3 hr",
   },
   {
@@ -124,7 +121,7 @@ export const nearby: {
     line: "Watch make-up, music and mime come together at a Fort Kochi theatre.",
     src: kathakali,
     alt: "Kathakali costumes on display in a Kochi cultural centre",
-    fromHalcyon: "1 hr",
+    fromCity: "30 min",
     fromAirport: "1 hr 30",
   },
 ];
@@ -144,7 +141,7 @@ export const faqs: { q: string; a: string }[] = [
   },
   {
     q: "Do you offer weekly or monthly rates?",
-    a: "We do, at all three stays. Halcyon Suites and Hovato Brown are especially well suited to long stays.",
+    a: "We do. Several of our stays are set up for longer visits. Tell us how long you're staying and we'll suggest the best fit.",
   },
   {
     q: "What do I need at check-in?",

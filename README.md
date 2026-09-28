@@ -1,6 +1,6 @@
 # Hovato website
 
-Marketing site for **Hovato**, a family of three stays in Kochi, Kerala:
+Marketing site for **Hovato**, a growing family of stays in Kochi, Kerala. At launch:
 
 | Stay | What it is | Where |
 | --- | --- | --- |
@@ -23,10 +23,21 @@ Deploy on Netlify: build command `npm run build`, publish directory `dist` (alre
 ## Where things live
 
 - `src/data/site.ts`: phone, WhatsApp, email, social links, check-in/out times
-- `src/data/stays.ts`: everything about the three stays (copy, facts, amenities, FAQs, photos, colours)
+- `src/data/stays.ts`: everything about each stay (copy, facts, amenities, FAQs, photos, colours)
 - `src/data/home.ts`: home page content (hero slides, "Find your stay", the Hovato standard, nearby places, FAQs)
 - `src/assets/images/`: photos (Astro resizes and converts them to AVIF/WebP at build time)
 - `public/og/`: social share images
+
+## Adding a new stay
+
+The site is built so a new property is one data entry, not a redesign. No page copy counts or lists the stays.
+
+1. Put its photos in `src/assets/images/`.
+2. In `src/data/stays.ts`, copy an existing entry, give it a new `slug`, and add that slug to the `StaySlug` type.
+3. Set its `pin` (map position, see the projection note in `src/components/MapKochi.astro`) and `route` to the airport.
+4. Optionally point a "What brings you to Kochi?" option at it in `src/data/home.ts`.
+
+The home page cards, hero slideshow, stats, menus, booking drawer, map, footer, sitemap, search-engine data and its own `/stays/<slug>/` page all update from that entry. Add a social image at `public/og/<slug>.jpg`.
 
 ## Before launch: confirm with Hovato
 

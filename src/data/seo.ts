@@ -29,9 +29,8 @@ function organization(origin: string) {
 }
 
 function lodging(stay: Stay, origin: string) {
-  const locality = stay.areaShort === "Airport" ? "Nedumbassery" : "Manjummal";
   return {
-    "@type": stay.slug === "bohom-stayora" ? "Hotel" : "LodgingBusiness",
+    "@type": stay.schemaType,
     "@id": `${origin}/stays/${stay.slug}/#lodging`,
     name: stay.name,
     description: stay.summary,
@@ -40,7 +39,7 @@ function lodging(stay: Stay, origin: string) {
     // TODO: add streetAddress, postalCode and geo once Hovato confirms them.
     address: {
       "@type": "PostalAddress",
-      addressLocality: locality,
+      addressLocality: stay.locality,
       addressRegion: "Kerala",
       addressCountry: "IN",
     },

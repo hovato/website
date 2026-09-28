@@ -1,10 +1,12 @@
 ---
+import { stays } from "../data/stays";
+
 interface Props {
   words?: string[];
   tone?: "light" | "dark";
 }
 const {
-  words = ["Manjummal", "Nedumbassery", "Periyar", "Fort Kochi", "Kerala", "Kochi"],
+  words = [...new Set([...stays.map((s) => s.locality), "Periyar", "Fort Kochi", "Kerala", "Kochi"])],
   tone = "light",
 } = Astro.props;
 ---
