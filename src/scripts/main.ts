@@ -606,7 +606,7 @@ if (finePointer && !reduceMotion) {
 // ── Cursor ──────────────────────────────────────────────────────────────────
 (function cursor() {
   const el = $("[data-cursor]");
-  const label = $("[data-cursor-label]");
+  const label = $("[data-cursor-text]");
   if (!el || !label || !finePointer || reduceMotion) return;
   const xTo = gsap.quickTo(el, "x", { duration: 0.35, ease: "power3.out" });
   const yTo = gsap.quickTo(el, "y", { duration: 0.35, ease: "power3.out" });
