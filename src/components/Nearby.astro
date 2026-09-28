@@ -1,0 +1,195 @@
+---
+import { Picture } from "astro:assets";
+import Icon from "./Icon.astro";
+import { nearby } from "../data/home";
+---
+
+<section class="explore section" id="explore" aria-labelledby="explore-title">
+  <div class="wrap section-head section-head--split explore__head">
+    <div>
+      <p class="eyebrow eyebrow--rule" data-reveal>Explore Kochi</p>
+      <h2 class="h2" id="explore-title" data-split>Beyond <em>the door.</em></h2>
+    </div>
+    <div class="explore__side">
+      <p class="muted" data-reveal>
+        Spice warehouses and fishing nets, waterfalls and tea country. Our hosts will happily plan a day out. Here's
+        where guests usually start.
+      </p>
+      <div class="explore__nav" data-reveal>
+        <button type="button" class="explore__btn" data-rail-prev aria-label="Previous places">
+          <Icon name="arrow-left" size={18} />
+        </button>
+        <button type="button" class="explore__btn" data-rail-next aria-label="More places">
+          <Icon name="arrow-right" size={18} />
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="explore__rail" data-rail data-cursor-label="Drag" data-lenis-prevent-horizontal>
+    <ul class="explore__track" role="list" data-reveal-stagger>
+      {
+        nearby.map((n, i) => (
+          <li class="place">
+            <div class="place__img frame">
+              <Picture
+                src={n.src}
+                alt={n.alt}
+                widths={[400, 640, 900]}
+                sizes="(min-width: 900px) 28vw, 78vw"
+                formats={["avif", "webp"]}
+                loading="lazy"
+                draggable="false"
+              />
+              <span class="place__index">{String(i + 1).padStart(2, "0")}</span>
+            </div>
+            <h3 class="h4 place__name">{n.name}</h3>
+            <p class="place__line muted">{n.line}</p>
+            <p class="place__times">
+              <span>
+                <Icon name="clock" size={14} /> {n.fromHalcyon} from Halcyon
+              </span>
+              <span>
+                <Icon name="plane" size={14} /> {n.fromAirport} from the airport stays
+              </span>
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+  <div class="wrap">
+    <div class="explore__progress" aria-hidden="true"><i data-rail-progress></i></div>
+    <p class="explore__note small muted">Drive times are approximate and depend on traffic.</p>
+  </div>
+</section>
+
+<style>
+  .explore__head {
+    margin-bottom: clamp(2.5rem, 4vw, 4rem);
+  }
+  .explore__head .h2 {
+    margin-top: 1.25rem;
+  }
+  .explore__side {
+    display: grid;
+    gap: 1.5rem;
+    justify-items: start;
+  }
+  .explore__side p {
+    max-width: 44ch;
+  }
+  .explore__nav {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .explore__btn {
+    display: grid;
+    place-items: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    transition:
+      background-color 0.35s var(--ease-out),
+      color 0.35s,
+      opacity 0.3s;
+  }
+  .explore__btn:hover:not(:disabled) {
+    background: var(--ink);
+    color: var(--cream);
+  }
+  .explore__btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  .explore__rail {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: max(var(--gutter), calc((100vw - var(--max)) / 2));
+    scrollbar-width: none;
+    cursor: grab;
+  }
+  .explore__rail::-webkit-scrollbar {
+    display: none;
+  }
+  .explore__rail:global(.is-dragging) {
+    cursor: grabbing;
+    scroll-snap-type: none;
+  }
+  .explore__rail:global(.is-dragging) .place {
+    pointer-events: none;
+  }
+  .explore__track {
+    display: flex;
+    gap: clamp(1rem, 2vw, 1.75rem);
+    width: max-content;
+    padding-inline: max(var(--gutter), calc((100vw - var(--max)) / 2));
+  }
+  .place {
+    width: clamp(260px, 26vw, 400px);
+    scroll-snap-align: start;
+    user-select: none;
+  }
+  .place__img {
+    aspect-ratio: 4 / 5;
+    border-radius: var(--radius-l);
+    margin-bottom: 1.25rem;
+  }
+  .place__img :global(img) {
+    transition: transform 1.4s var(--ease-out);
+    -webkit-user-drag: none;
+  }
+  .place:hover .place__img :global(img) {
+    transform: scale(1.06);
+  }
+  .place__index {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    background: rgb(242 236 227 / 0.9);
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+  }
+  .place__name {
+    margin-bottom: 0.4rem;
+  }
+  .place__line {
+    font-size: 0.95rem;
+    margin-bottom: 0.9rem;
+  }
+  .place__times {
+    display: grid;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--ink-3);
+  }
+  .place__times span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+  .explore__progress {
+    position: relative;
+    height: 2px;
+    margin-top: clamp(2rem, 4vw, 3rem);
+    background: var(--line);
+    overflow: hidden;
+    border-radius: 2px;
+  }
+  .explore__progress i {
+    position: absolute;
+    inset: 0;
+    background: var(--ink);
+    transform-origin: left;
+    transform: scaleX(0.2);
+  }
+  .explore__note {
+    margin-top: 1rem;
+  }
+</style>

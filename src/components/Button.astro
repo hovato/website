@@ -1,0 +1,57 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Icon from "./Icon.astro";
+
+type Variant = "solid" | "light" | "brass" | "accent" | "ghost" | "ghost-light";
+
+interface Props extends Omit<HTMLAttributes<"a">, "type"> {
+  href?: string;
+  variant?: Variant;
+  size?: "sm" | "md" | "lg";
+  icon?: string;
+  /** Put the icon before the label instead of after it. */
+  iconFirst?: boolean;
+  block?: boolean;
+  type?: "button" | "submit";
+  magnetic?: boolean;
+}
+
+const {
+  href,
+  variant = "solid",
+  size = "md",
+  icon,
+  iconFirst = false,
+  block = false,
+  type = "button",
+  magnetic = false,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const label = (await Astro.slots.render("default")).trim();
+const classes = [
+  "btn",
+  variant !== "solid" && `btn--${variant}`,
+  size !== "md" && `btn--${size}`,
+  block && "btn--block",
+  className,
+];
+const Tag = href ? "a" : "button";
+const nudge = icon?.startsWith("arrow");
+---
+
+<Tag
+  class:list={classes}
+  href={href}
+  type={href ? undefined : type}
+  data-magnetic={magnetic ? "" : undefined}
+  {...rest}
+>
+  {icon && iconFirst && <Icon name={icon} size={18} />}
+  <span class="btn__label">
+    <span set:html={label} />
+    <span aria-hidden="true" set:html={label} />
+  </span>
+  {icon && !iconFirst && <Icon name={icon} size={18} class={nudge ? "icon--nudge" : ""} />}
+</Tag>

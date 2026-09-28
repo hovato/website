@@ -1,0 +1,525 @@
+---
+import { Picture } from "astro:assets";
+import Logo from "./Logo.astro";
+import Icon from "./Icon.astro";
+import Button from "./Button.astro";
+import { stays } from "../data/stays";
+import { site, whatsappHref, mailHref } from "../data/site";
+
+interface Props {
+  /** "light" = light text over a dark hero image, "dark" = dark text on cream. */
+  theme?: "light" | "dark";
+}
+const { theme = "light" } = Astro.props;
+const path = Astro.url.pathname;
+---
+
+<header class="site-header" data-header data-theme={theme}>
+  <div class="site-header__inner wrap">
+    <a href="/" class="site-header__brand" aria-label="Hovato home">
+      <Logo />
+    </a>
+
+    <nav class="site-nav" aria-label="Primary">
+      <ul role="list">
+        <li class="site-nav__stays" data-stays>
+          <button
+            class="site-nav__link"
+            type="button"
+            aria-expanded="false"
+            aria-controls="stays-panel"
+            data-stays-toggle
+          >
+            Our stays <Icon name="chevron-down" size={14} class="site-nav__chev" />
+          </button>
+        </li>
+        <li><a class="site-nav__link" href="/#standard">The Hovato standard</a></li>
+        <li><a class="site-nav__link" href="/#explore">Explore Kochi</a></li>
+        <li><a class="site-nav__link" href="/#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <div class="site-header__actions">
+      <a class="site-header__wa" href={whatsappHref()} target="_blank" rel="noopener" aria-label="Chat with Hovato on WhatsApp">
+        <Icon name="whatsapp" size={18} />
+      </a>
+      <Button size="sm" variant="light" class="site-header__book" data-book-open="auto" magnetic>Book a stay</Button>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu" data-menu-toggle>
+        <span class="sr-only">Menu</span>
+        <span class="menu-toggle__bars" aria-hidden="true"><i></i><i></i></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Desktop mega panel -->
+  <div class="stays-panel" id="stays-panel" data-stays-panel>
+    <div class="stays-panel__inner wrap">
+      <div class="stays-panel__intro">
+        <p class="eyebrow eyebrow--rule">The collection</p>
+        <p class="stays-panel__title serif">Three stays, <em>one standard.</em></p>
+        <a class="link link--under small" href="/#stays">Compare all three <Icon name="arrow-right" size={14} /></a>
+      </div>
+      {
+        stays.map((s) => (
+          <a
+            class="stays-panel__card"
+            href={`/stays/${s.slug}/`}
+            style={`--accent:${s.theme.accent}`}
+            aria-current={path.startsWith(`/stays/${s.slug}`) ? "page" : undefined}
+          >
+            <div class="stays-panel__img frame">
+              <Picture src={s.hero.src} alt="" widths={[360, 560]} sizes="280px" formats={["avif", "webp"]} loading="lazy" />
+            </div>
+            <span class="stays-panel__meta">
+              <span class="stays-panel__index">{s.index}</span>
+              <span class="stays-panel__kind">{s.kind}</span>
+            </span>
+            <span class="stays-panel__name serif">{s.name}</span>
+            <span class="stays-panel__area small">{s.area}</span>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</header>
+
+<!-- Full-screen menu (mobile & tablet) -->
+<div class="site-menu" id="site-menu" data-menu aria-hidden="true" inert>
+  <div class="site-menu__inner wrap">
+    <nav aria-label="Menu" class="site-menu__nav">
+      <p class="eyebrow eyebrow--rule site-menu__label" data-menu-item>Our stays</p>
+      <ul role="list" class="site-menu__stays">
+        {
+          stays.map((s) => (
+            <li data-menu-item>
+              <a href={`/stays/${s.slug}/`} class="site-menu__stay">
+                <span class="site-menu__thumb frame">
+                  <Picture src={s.hero.src} alt="" widths={[160, 240]} sizes="80px" formats={["avif", "webp"]} loading="lazy" />
+                </span>
+                <span>
+                  <span class="site-menu__stay-name serif">{s.name}</span>
+                  <span class="site-menu__stay-meta">{s.inventory} · {s.areaShort}</span>
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <ul role="list" class="site-menu__links">
+        <li data-menu-item><a href="/#standard" class="serif">The Hovato standard</a></li>
+        <li data-menu-item><a href="/#explore" class="serif">Explore Kochi</a></li>
+        <li data-menu-item><a href="/#contact" class="serif">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="site-menu__foot" data-menu-item>
+      <Button variant="brass" data-book-open="auto" block>Book a stay</Button>
+      <div class="site-menu__contact">
+        <a href={whatsappHref()} target="_blank" rel="noopener"><Icon name="whatsapp" size={18} /> WhatsApp</a>
+        <a href={`tel:${site.contact.phone.tel}`}><Icon name="phone" size={18} /> Call</a>
+        <a href={mailHref()}><Icon name="mail" size={18} /> Email</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .site-header {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 900;
+    color: var(--on-dark);
+    transition:
+      color 0.4s var(--ease-out),
+      transform 0.6s var(--ease-out);
+  }
+  .site-header[data-theme="dark"] {
+    color: var(--ink);
+  }
+  .site-header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: rgb(242 236 227 / 0.86);
+    backdrop-filter: blur(16px) saturate(1.3);
+    -webkit-backdrop-filter: blur(16px) saturate(1.3);
+    box-shadow: 0 1px 0 var(--line);
+    opacity: 0;
+    transition: opacity 0.4s var(--ease-out);
+  }
+  .site-header:global(.is-scrolled),
+  .site-header:global(.is-panel-open) {
+    color: var(--ink);
+  }
+  .site-header:global(.is-scrolled)::before,
+  .site-header:global(.is-panel-open)::before {
+    opacity: 1;
+  }
+  .site-header:global(.is-hidden) {
+    transform: translateY(-100%);
+  }
+  :global(html.menu-open) .site-header {
+    color: var(--on-dark);
+    transform: none;
+  }
+  :global(html.menu-open) .site-header::before {
+    opacity: 0;
+  }
+
+  .site-header__inner {
+    height: var(--header-h);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 2rem;
+  }
+  .site-header__brand {
+    justify-self: start;
+    font-size: 0.95rem;
+    padding: 0.4rem 0;
+  }
+  .site-nav ul {
+    display: flex;
+    gap: clamp(1.25rem, 2.2vw, 2.4rem);
+  }
+  .site-nav__link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    padding: 0.6rem 0;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .site-nav__link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0.25rem;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.5s var(--ease-out);
+  }
+  .site-nav__link:hover::after,
+  .site-nav__link[aria-expanded="true"]::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  .site-nav__link :global(.site-nav__chev) {
+    transition: transform 0.4s var(--ease-out);
+  }
+  .site-nav__link[aria-expanded="true"] :global(.site-nav__chev) {
+    transform: rotate(180deg);
+  }
+  .site-header__actions {
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .site-header__wa {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px currentColor;
+    opacity: 0.9;
+    transition:
+      background-color 0.3s,
+      color 0.3s;
+  }
+  .site-header__wa:hover {
+    background: #25d366;
+    color: #fff;
+    box-shadow: none;
+  }
+  .site-header:global(.is-scrolled) :global(.site-header__book),
+  .site-header[data-theme="dark"] :global(.site-header__book),
+  .site-header:global(.is-panel-open) :global(.site-header__book) {
+    --btn-bg: var(--ink);
+    --btn-fg: var(--cream);
+    --btn-fill: var(--brass);
+    --btn-fill-fg: var(--ink);
+  }
+  :global(html.menu-open) .site-header :global(.site-header__book) {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .menu-toggle {
+    display: none;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px currentColor;
+    place-items: center;
+  }
+  .menu-toggle__bars {
+    position: relative;
+    display: block;
+    width: 18px;
+    height: 8px;
+  }
+  .menu-toggle__bars i {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 1.5px;
+    background: currentColor;
+    transition:
+      transform 0.5s var(--ease-out),
+      top 0.5s var(--ease-out);
+  }
+  .menu-toggle__bars i:first-child {
+    top: 0;
+  }
+  .menu-toggle__bars i:last-child {
+    top: 6.5px;
+  }
+  .menu-toggle[aria-expanded="true"] .menu-toggle__bars i:first-child {
+    top: 3.25px;
+    transform: rotate(45deg);
+  }
+  .menu-toggle[aria-expanded="true"] .menu-toggle__bars i:last-child {
+    top: 3.25px;
+    transform: rotate(-45deg);
+  }
+
+  @media (max-width: 1080px) {
+    .site-nav {
+      display: none;
+    }
+    .site-header__inner {
+      grid-template-columns: 1fr auto;
+    }
+    .menu-toggle {
+      display: grid;
+    }
+    .stays-panel {
+      display: none;
+    }
+  }
+  @media (max-width: 560px) {
+    .site-header__wa,
+    .site-header :global(.site-header__book) {
+      display: none;
+    }
+    .site-header__brand {
+      font-size: 0.85rem;
+    }
+  }
+
+  /* ── Mega panel ── */
+  .stays-panel {
+    position: absolute;
+    inset: 100% 0 auto;
+    color: var(--ink);
+    background: var(--cream);
+    box-shadow: 0 30px 60px -30px rgb(26 21 18 / 0.35);
+    clip-path: inset(0 0 100% 0);
+    visibility: hidden;
+    transition:
+      clip-path 0.7s var(--ease-out),
+      visibility 0s linear 0.7s;
+  }
+  .site-header:global(.is-panel-open) .stays-panel {
+    clip-path: inset(0 0 0 0);
+    visibility: visible;
+    transition:
+      clip-path 0.7s var(--ease-out),
+      visibility 0s;
+  }
+  .stays-panel__inner {
+    display: grid;
+    grid-template-columns: 1.1fr repeat(3, 1fr);
+    gap: 2rem;
+    padding-block: 2.5rem 3rem;
+    border-top: 1px solid var(--line);
+  }
+  .stays-panel__intro {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+    padding-right: 2rem;
+  }
+  .stays-panel__title {
+    font-size: 2.4rem;
+    line-height: 1;
+  }
+  .stays-panel__card {
+    display: grid;
+    gap: 0.35rem;
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 0.5s var(--ease-out),
+      transform 0.6s var(--ease-out);
+  }
+  .site-header:global(.is-panel-open) .stays-panel__card {
+    opacity: 1;
+    transform: none;
+  }
+  .site-header:global(.is-panel-open) .stays-panel__card:nth-child(3) {
+    transition-delay: 0.06s;
+  }
+  .site-header:global(.is-panel-open) .stays-panel__card:nth-child(4) {
+    transition-delay: 0.12s;
+  }
+  .stays-panel__img {
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius-m);
+    margin-bottom: 0.9rem;
+  }
+  .stays-panel__img :global(img) {
+    transition: transform 1.2s var(--ease-out);
+  }
+  .stays-panel__card:hover .stays-panel__img :global(img) {
+    transform: scale(1.06);
+  }
+  .stays-panel__meta {
+    display: flex;
+    gap: 0.75rem;
+    font-size: var(--fs-micro);
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .stays-panel__name {
+    font-size: 1.75rem;
+    line-height: 1.05;
+  }
+  .stays-panel__area {
+    color: var(--stone);
+  }
+
+  /* ── Menu overlay ── */
+  .site-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 850;
+    background: var(--ink);
+    color: var(--on-dark);
+    clip-path: circle(0% at calc(100% - 3rem) 2.6rem);
+    visibility: hidden;
+    transition:
+      clip-path 0.9s var(--ease-in-out),
+      visibility 0s linear 0.9s;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  :global(html.menu-open) .site-menu {
+    clip-path: circle(150% at calc(100% - 3rem) 2.6rem);
+    visibility: visible;
+    transition:
+      clip-path 0.9s var(--ease-in-out),
+      visibility 0s;
+  }
+  .site-menu__inner {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 3rem;
+    padding-block: calc(var(--header-h) + 2rem) 2rem;
+  }
+  .site-menu__label {
+    color: var(--brass);
+    margin-bottom: 1.25rem;
+  }
+  .site-menu__stays {
+    display: grid;
+    gap: 0.9rem;
+    margin-bottom: 2.5rem;
+  }
+  .site-menu__stay {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .site-menu__thumb {
+    width: 64px;
+    height: 76px;
+    border-radius: var(--arch);
+    flex: none;
+  }
+  .site-menu__stay-name {
+    display: block;
+    font-size: 1.9rem;
+    line-height: 1.05;
+  }
+  .site-menu__stay-meta {
+    display: block;
+    font-size: 0.82rem;
+    color: var(--on-dark-muted);
+  }
+  .site-menu__links {
+    display: grid;
+    gap: 0.35rem;
+    border-top: 1px solid var(--line-dark);
+    padding-top: 1.5rem;
+  }
+  .site-menu__links a {
+    font-size: clamp(2rem, 7vw, 2.8rem);
+    line-height: 1.2;
+  }
+  .site-menu__foot {
+    display: grid;
+    gap: 1.5rem;
+  }
+  .site-menu__contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  .site-menu__contact a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--on-dark-muted);
+  }
+  .site-menu [data-menu-item] {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.5s var(--ease-out),
+      transform 0.7s var(--ease-out);
+  }
+  :global(html.menu-open) .site-menu [data-menu-item] {
+    opacity: 1;
+    transform: none;
+  }
+  :global(html.menu-open) .site-menu [data-menu-item]:nth-of-type(1) {
+    transition-delay: 0.25s;
+  }
+  :global(html.menu-open) .site-menu__stays [data-menu-item]:nth-child(1) {
+    transition-delay: 0.3s;
+  }
+  :global(html.menu-open) .site-menu__stays [data-menu-item]:nth-child(2) {
+    transition-delay: 0.35s;
+  }
+  :global(html.menu-open) .site-menu__stays [data-menu-item]:nth-child(3) {
+    transition-delay: 0.4s;
+  }
+  :global(html.menu-open) .site-menu__links [data-menu-item]:nth-child(1) {
+    transition-delay: 0.45s;
+  }
+  :global(html.menu-open) .site-menu__links [data-menu-item]:nth-child(2) {
+    transition-delay: 0.5s;
+  }
+  :global(html.menu-open) .site-menu__links [data-menu-item]:nth-child(3) {
+    transition-delay: 0.55s;
+  }
+  :global(html.menu-open) .site-menu__foot {
+    transition-delay: 0.6s;
+  }
+</style>

@@ -1,0 +1,86 @@
+---
+import { Picture } from "astro:assets";
+import Button from "./Button.astro";
+import { whatsappHref } from "../data/site";
+import palmShadow from "../assets/images/palm-shadow-warm.jpg";
+
+interface Props {
+  staySlug?: string;
+  eyebrow?: string;
+}
+const { staySlug, eyebrow = "Book direct" } = Astro.props;
+---
+
+<section class="cta" aria-labelledby="cta-title">
+  <div class="cta__bg" aria-hidden="true" data-parallax-bg>
+    <Picture src={palmShadow} alt="" widths={[960, 1600, 2400]} sizes="100vw" formats={["avif", "webp"]} loading="lazy" data-parallax="0.18" />
+  </div>
+  <div class="wrap cta__inner">
+    <p class="eyebrow eyebrow--rule" data-reveal>{eyebrow}</p>
+    <h2 class="display-l cta__title" id="cta-title" data-split>Tell us your dates.<br /><em>We'll handle the rest.</em></h2>
+    <p class="cta__text" data-reveal>
+      No booking engine, no platform fees. Send your dates and a real person at Hovato will confirm your room and rate.
+    </p>
+    <div class="cta__actions" data-reveal>
+      <Button size="lg" icon="arrow-right" data-book-open="auto" data-book-stay={staySlug} magnetic>Plan your stay</Button>
+      <Button size="lg" variant="ghost" icon="whatsapp" iconFirst href={whatsappHref()} target="_blank" rel="noopener">
+        WhatsApp us
+      </Button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    padding-block: clamp(7rem, 5rem + 10vw, 13rem);
+    background: #cdb89a;
+  }
+  .cta__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+  .cta__bg :global(picture) {
+    height: 100%;
+  }
+  .cta__bg :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.9;
+  }
+  .cta::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(70% 90% at 30% 50%, rgb(242 236 227 / 0.9), rgb(242 236 227 / 0.55) 60%, rgb(242 236 227 / 0.25)),
+      linear-gradient(0deg, rgb(242 236 227 / 0.35), transparent 40%);
+  }
+  .cta__inner {
+    display: grid;
+    justify-items: start;
+    gap: 1.6rem;
+  }
+  .cta__inner .eyebrow {
+    color: var(--brass-text);
+  }
+  .cta__title {
+    font-size: clamp(2.6rem, 1.2rem + 5vw, 6.2rem);
+  }
+  .cta__text {
+    max-width: 46ch;
+    font-size: 1.1rem;
+    color: var(--ink-3);
+  }
+  .cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+</style>

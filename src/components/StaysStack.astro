@@ -1,0 +1,279 @@
+---
+import { Picture } from "astro:assets";
+import Icon from "./Icon.astro";
+import Button from "./Button.astro";
+import { stays } from "../data/stays";
+---
+
+<section class="stays section" id="stays" aria-labelledby="stays-title">
+  <div class="wrap section-head section-head--split">
+    <div>
+      <p class="eyebrow eyebrow--rule" data-reveal>The collection</p>
+      <h2 class="h2 stays__title" id="stays-title" data-split>Three stays.<br /><em>One standard.</em></h2>
+    </div>
+    <p class="lede muted" data-reveal>
+      Each Hovato stay has its own character, from family-sized apartments to easy airport rooms. What they share is
+      the way they're kept: spotless, unfussy and looked after by people who answer the phone.
+    </p>
+  </div>
+
+  <div class="stays__stack wrap">
+    {
+      stays.map((s, i) => (
+        <article
+          class="stay-card"
+          data-stay-card
+          style={`--accent:${s.theme.accent};--tint:${s.theme.tint};--deep:${s.theme.deep};--i:${i}`}
+          aria-labelledby={`stay-${s.slug}`}
+        >
+          <div class="stay-card__text">
+            <div class="stay-card__top">
+              <span class="stay-card__index serif">{s.index}</span>
+              <span class="eyebrow">{s.kind}</span>
+            </div>
+            <h3 class="stay-card__name display-l" id={`stay-${s.slug}`}>
+              <a href={`/stays/${s.slug}/`}>
+                {s.nameLines[0]}
+                <br />
+                <em>{s.nameLines[1]}</em>
+              </a>
+            </h3>
+            <p class="stay-card__area">
+              <Icon name="map-pin" size={16} /> {s.area}
+            </p>
+            <p class="stay-card__summary">{s.summary}</p>
+            <dl class="stay-card__facts">
+              {s.facts.map((f) => (
+                <div>
+                  <dt>{f.label}</dt>
+                  <dd class="serif">{f.value}</dd>
+                </div>
+              ))}
+            </dl>
+            <div class="stay-card__cta">
+              <Button href={`/stays/${s.slug}/`} variant="light" icon="arrow-right" aria-label={`Step inside ${s.name}`}>
+                Step inside
+              </Button>
+              <Button variant="ghost-light" data-book-open="dates" data-book-stay={s.slug}>
+                Check dates
+              </Button>
+            </div>
+          </div>
+
+          <a class="stay-card__media" href={`/stays/${s.slug}/`} data-cursor-label="Explore" tabindex="-1" aria-hidden="true">
+            <div class="stay-card__main frame" style={`view-transition-name: stay-${s.slug}`}>
+              <Picture
+                src={s.hero.src}
+                alt=""
+                widths={[640, 960, 1280, 1680]}
+                sizes="(min-width: 1000px) 52vw, 92vw"
+                formats={["avif", "webp"]}
+                loading="lazy"
+                data-parallax="0.12"
+              />
+            </div>
+            <div class="stay-card__detail frame">
+              <Picture src={s.cardDetail.src} alt="" widths={[320, 480]} sizes="220px" formats={["avif", "webp"]} loading="lazy" />
+            </div>
+            <span class="stay-card__badge">
+              <strong class="serif">{s.unit.count}</strong>
+              <span>{s.unit.count === 1 ? s.unit.singular : s.unit.plural}</span>
+            </span>
+          </a>
+        </article>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .stays {
+    padding-bottom: calc(var(--section) * 0.6);
+  }
+  .stays__stack {
+    display: grid;
+    gap: 2rem;
+  }
+  .stay-card {
+    position: sticky;
+    top: calc(var(--header-h) + 1rem + var(--i) * 1.1rem);
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(1.5rem, 4vw, 4.5rem);
+    min-height: min(82vh, 820px);
+    padding: clamp(1.5rem, 3.5vw, 3.25rem);
+    border-radius: var(--radius-l);
+    background: var(--accent);
+    color: var(--on-dark);
+    box-shadow: 0 -20px 60px -30px rgb(26 21 18 / 0.45);
+    transform-origin: 50% 0;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .stay-card::before {
+    /* soft light from the top-left */
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(120% 90% at 0% 0%, rgb(255 255 255 / 0.1), transparent 55%),
+      radial-gradient(90% 90% at 100% 100%, var(--deep), transparent 70%);
+  }
+  .stay-card__text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+    padding-block: 0.5rem;
+  }
+  .stay-card__top {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid rgb(242 236 227 / 0.2);
+  }
+  .stay-card__top .eyebrow {
+    color: rgb(242 236 227 / 0.8);
+  }
+  .stay-card__index {
+    font-size: 1.6rem;
+    line-height: 1;
+    color: #e9d6b8;
+  }
+  .stay-card__name {
+    margin-top: auto;
+  }
+  .stay-card__name a {
+    display: inline-block;
+  }
+  .stay-card__name em {
+    color: #e9d6b8;
+  }
+  .stay-card__area {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 0.92rem;
+    color: rgb(242 236 227 / 0.85);
+  }
+  .stay-card__summary {
+    max-width: 42ch;
+    color: rgb(242 236 227 / 0.8);
+  }
+  .stay-card__facts {
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    gap: 1rem 1.75rem;
+    padding-block: 0.5rem 0.75rem;
+  }
+  .stay-card__facts dt {
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgb(242 236 227 / 0.65);
+  }
+  .stay-card__facts dd {
+    font-size: 1.55rem;
+    line-height: 1.15;
+  }
+  .stay-card__cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .stay-card__media {
+    position: relative;
+    display: block;
+    min-height: 420px;
+  }
+  .stay-card__main {
+    position: absolute;
+    inset: 0 0 0 12%;
+    border-radius: var(--arch);
+  }
+  .stay-card__main :global(img) {
+    transition: scale 1.4s var(--ease-out);
+  }
+  .stay-card__media:hover .stay-card__main :global(img) {
+    scale: 1.04;
+  }
+  .stay-card__detail {
+    position: absolute;
+    left: 0;
+    bottom: 8%;
+    width: 30%;
+    aspect-ratio: 4 / 5;
+    border-radius: var(--radius-m);
+    box-shadow: 0 30px 50px -20px rgb(0 0 0 / 0.45);
+    outline: 6px solid var(--accent);
+  }
+  .stay-card__badge {
+    position: absolute;
+    right: 1.25rem;
+    top: 1.25rem;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    width: 6.5rem;
+    height: 6.5rem;
+    border-radius: 50%;
+    background: var(--cream);
+    color: var(--ink);
+    text-align: center;
+    line-height: 1;
+    transform: rotate(-8deg);
+  }
+  .stay-card__badge strong {
+    font-size: 2.3rem;
+    font-weight: 400;
+  }
+  .stay-card__badge span {
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-top: 0.2rem;
+  }
+
+  @media (max-width: 1000px) {
+    .stay-card {
+      position: relative;
+      top: auto;
+      grid-template-columns: 1fr;
+      min-height: 0;
+    }
+    .stay-card__media {
+      order: -1;
+      min-height: 0;
+      aspect-ratio: 4 / 3.6;
+    }
+    .stay-card__main {
+      inset: 0 0 0 8%;
+    }
+    .stay-card__name {
+      margin-top: 0.5rem;
+    }
+    .stay-card__facts {
+      grid-template-columns: repeat(2, auto);
+    }
+  }
+  @media (max-width: 560px) {
+    .stay-card__badge {
+      width: 5rem;
+      height: 5rem;
+    }
+    .stay-card__badge strong {
+      font-size: 1.8rem;
+    }
+    .stay-card__detail {
+      width: 34%;
+      outline-width: 4px;
+    }
+  }
+</style>

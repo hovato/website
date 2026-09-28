@@ -1,0 +1,97 @@
+---
+// First-visit intro on the home page. Shown only when <html> has .has-intro
+// (set by an inline script in the layout, once per browser session).
+const letters = "HOVATO".split("");
+---
+
+<div class="intro" data-intro aria-hidden="true">
+  <div class="intro__center">
+    <svg class="intro__mark" viewBox="0 0 40 48" data-intro-mark>
+      <path d="M9 45V20a11 11 0 0 1 22 0v25"></path>
+      <path d="M3 45.5h34"></path>
+      <circle cx="20" cy="24" r="2"></circle>
+    </svg>
+    <p class="intro__word serif">
+      {letters.map((l) => <span class="intro__clip"><span data-intro-letter>{l}</span></span>)}
+    </p>
+    <p class="intro__sub" data-intro-sub>Bespoke hospitality · Kochi</p>
+  </div>
+  <div class="intro__bar"><i data-intro-bar></i></div>
+</div>
+
+<style>
+  .intro {
+    display: none;
+  }
+  :global(html.has-intro) .intro {
+    position: fixed;
+    inset: 0;
+    z-index: 9500;
+    display: grid;
+    place-items: center;
+    background: var(--cream);
+    color: var(--ink);
+  }
+  :global(html.has-intro) body {
+    overflow: hidden;
+  }
+  .intro__center {
+    display: grid;
+    justify-items: center;
+    gap: 1.4rem;
+  }
+  .intro__mark {
+    width: clamp(44px, 5vw, 64px);
+    overflow: visible;
+  }
+  .intro__mark path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+  }
+  .intro__mark circle {
+    fill: var(--brass);
+  }
+  .intro__word {
+    display: flex;
+    font-size: clamp(3.2rem, 2rem + 6vw, 7.5rem);
+    line-height: 1;
+    letter-spacing: 0.18em;
+    margin-right: -0.18em;
+  }
+  .intro__clip {
+    display: inline-block;
+    overflow: hidden;
+    padding-block: 0.08em;
+  }
+  .intro__clip > span {
+    display: inline-block;
+    transform: translateY(110%);
+  }
+  .intro__sub {
+    font-size: var(--fs-micro);
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--brass-text);
+    opacity: 0;
+  }
+  .intro__bar {
+    position: absolute;
+    left: 50%;
+    bottom: clamp(2.5rem, 8vh, 5rem);
+    width: min(220px, 50vw);
+    height: 1px;
+    translate: -50% 0;
+    background: var(--line);
+    overflow: hidden;
+  }
+  .intro__bar i {
+    position: absolute;
+    inset: 0;
+    background: var(--ink);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+</style>

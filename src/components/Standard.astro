@@ -1,0 +1,164 @@
+---
+import { Picture } from "astro:assets";
+import Icon from "./Icon.astro";
+import { standards } from "../data/home";
+import palmsMist from "../assets/images/palms-mist.jpg";
+---
+
+<section class="standard section section--dark" id="standard" aria-labelledby="standard-title">
+  <div class="wrap standard__grid">
+    <div class="standard__visual">
+      <div class="standard__img frame frame--arch" data-img-reveal>
+        <Picture
+          src={palmsMist}
+          alt="Coconut palms in morning mist"
+          widths={[480, 720, 1080]}
+          sizes="(min-width: 1000px) 34vw, 90vw"
+          formats={["avif", "webp"]}
+          loading="lazy"
+          data-parallax="0.1"
+        />
+      </div>
+      <p class="standard__caption">Slow Kerala mornings.</p>
+    </div>
+
+    <div class="standard__body">
+      <p class="eyebrow eyebrow--rule standard__eyebrow" data-reveal>Why Hovato</p>
+      <h2 class="h2" id="standard-title" data-split>The Hovato <em>standard.</em></h2>
+      <p class="lede standard__lede" data-reveal>
+        Whether it's an airport room for one night or a two-bedroom apartment for a month, you get the same six promises.
+      </p>
+
+      <ul class="standard__list" role="list" data-reveal-stagger>
+        {
+          standards.map((s, i) => (
+            <li class="standard__item">
+              <span class="standard__num">{String(i + 1).padStart(2, "0")}</span>
+              <span class="standard__icon">
+                <Icon name={s.icon} size={26} stroke={1.25} />
+              </span>
+              <h3 class="h4">{s.title}</h3>
+              <p class="muted">{s.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .standard__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+    gap: clamp(2.5rem, 6vw, 7rem);
+  }
+  .standard__visual {
+    position: sticky;
+    top: calc(var(--header-h) + 2rem);
+    align-self: start;
+  }
+  .standard__img {
+    aspect-ratio: 3 / 4.2;
+  }
+  .standard__caption {
+    margin-top: 1rem;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--on-dark-muted);
+  }
+  .standard__eyebrow {
+    color: var(--brass);
+  }
+  .standard__body .h2 {
+    margin: 1.25rem 0 1.5rem;
+  }
+  .standard__lede {
+    max-width: 38ch;
+    color: var(--on-dark-muted);
+    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  }
+  .standard__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid var(--line-dark);
+  }
+  .standard__item {
+    position: relative;
+    display: grid;
+    gap: 0.75rem;
+    align-content: start;
+    padding: 2rem 2rem 2.25rem 0;
+    border-bottom: 1px solid var(--line-dark);
+  }
+  .standard__item:nth-child(odd) {
+    border-right: 1px solid var(--line-dark);
+  }
+  .standard__item:nth-child(even) {
+    padding-left: 2rem;
+  }
+  .standard__num {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--on-dark-muted);
+  }
+  .standard__item:nth-child(even) .standard__num {
+    right: 0;
+  }
+  .standard__icon {
+    display: grid;
+    place-items: center;
+    width: 3.4rem;
+    height: 3.4rem;
+    border-radius: 50%;
+    color: var(--brass);
+    box-shadow: inset 0 0 0 1px rgb(176 138 88 / 0.45);
+    margin-bottom: 0.75rem;
+    transition:
+      background-color 0.5s var(--ease-out),
+      color 0.5s,
+      transform 0.6s var(--ease-spring);
+  }
+  .standard__item:hover .standard__icon {
+    background: var(--brass);
+    color: var(--ink);
+    transform: rotate(-12deg) scale(1.05);
+  }
+  .standard__item p {
+    max-width: 34ch;
+    font-size: 0.95rem;
+  }
+  @media (max-width: 1000px) {
+    .standard__grid {
+      grid-template-columns: 1fr;
+    }
+    .standard__visual {
+      position: relative;
+      top: auto;
+      max-width: 420px;
+    }
+  }
+  @media (max-width: 620px) {
+    .standard__list {
+      grid-template-columns: 1fr;
+    }
+    .standard__item,
+    .standard__item:nth-child(even) {
+      padding: 1.75rem 0;
+      border-right: 0;
+    }
+    .standard__item:nth-child(odd) {
+      border-right: 0;
+    }
+    .standard__num,
+    .standard__item:nth-child(even) .standard__num {
+      right: 0;
+      top: 1.75rem;
+    }
+  }
+</style>

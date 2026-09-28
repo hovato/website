@@ -1,0 +1,818 @@
+---
+import { Picture } from "astro:assets";
+import Icon from "./Icon.astro";
+import { stays } from "../data/stays";
+import { site } from "../data/site";
+
+// Everything the booking script needs to know about each stay.
+const stayData = stays.map((s) => ({
+  slug: s.slug,
+  name: s.name,
+  area: s.area,
+  unitSingular: s.unit.singular,
+  unitPlural: s.unit.plural,
+  unitCount: s.unit.count,
+  maxGuestsPerUnit: s.maxGuestsPerUnit,
+  accent: s.theme.accent,
+}));
+const config = {
+  stays: stayData,
+  whatsapp: site.contact.whatsapp,
+  email: site.contact.email,
+};
+---
+
+<div class="book" id="book" data-book aria-hidden="true" inert>
+  <div class="book__scrim" data-book-close></div>
+
+  <div class="book__panel" role="dialog" aria-modal="true" aria-labelledby="book-title" tabindex="-1">
+    <header class="book__head">
+      <div class="book__head-row">
+        <p class="eyebrow eyebrow--rule">Plan your stay</p>
+        <button class="book__close" type="button" data-book-close aria-label="Close booking">
+          <Icon name="x" size={20} />
+        </button>
+      </div>
+      <h2 id="book-title" class="book__title serif" data-book-title>Where would you like to <em>stay?</em></h2>
+      <ol class="book__progress" role="list" aria-label="Booking steps">
+        <li data-step-dot="1"><span>01</span> Stay</li>
+        <li data-step-dot="2"><span>02</span> Dates &amp; guests</li>
+        <li data-step-dot="3"><span>03</span> Send</li>
+      </ol>
+    </header>
+
+    <div class="book__body" data-lenis-prevent data-book-body>
+      <!-- Step 1: choose a stay -->
+      <section class="book__step" data-step="1" aria-label="Choose a stay">
+        <fieldset class="book-stays">
+          <legend class="sr-only">Choose a stay</legend>
+          {
+            stays.map((s) => (
+              <label class="book-stay" style={`--accent:${s.theme.accent}; --tint:${s.theme.tint}`}>
+                <input type="radio" name="book-stay" value={s.slug} class="sr-only" />
+                <span class="book-stay__img frame">
+                  <Picture src={s.hero.src} alt="" widths={[200, 320]} sizes="120px" formats={["avif", "webp"]} loading="lazy" />
+                </span>
+                <span class="book-stay__text">
+                  <span class="book-stay__kind">{s.kind}</span>
+                  <span class="book-stay__name serif">{s.name}</span>
+                  <span class="book-stay__meta">
+                    {s.inventory} · {s.area}
+                  </span>
+                  <span class="book-stay__best">Best for {s.bestFor.slice(0, 2).join(" & ").toLowerCase()}</span>
+                </span>
+                <span class="book-stay__tick" aria-hidden="true">
+                  <Icon name="check" size={16} stroke={2} />
+                </span>
+              </label>
+            ))
+          }
+        </fieldset>
+      </section>
+
+      <!-- Step 2: dates & guests -->
+      <section class="book__step" data-step="2" aria-label="Dates and guests" hidden>
+        <div class="cal" data-cal>
+          <div class="cal__bar">
+            <p class="cal__status" data-cal-status aria-live="polite">Choose your check-in date</p>
+            <div class="cal__navs">
+              <button class="cal__nav" type="button" data-cal-prev aria-label="Previous month">
+                <Icon name="chevron-left" size={18} />
+              </button>
+              <button class="cal__nav" type="button" data-cal-next aria-label="Next month">
+                <Icon name="chevron-right" size={18} />
+              </button>
+            </div>
+          </div>
+          <div class="cal__months" data-cal-months></div>
+          <div class="cal__foot">
+            <div class="cal__pair">
+              <span class="cal__slot" data-cal-slot="in"><small>Check in</small><strong data-cal-in>Add date</strong></span>
+              <Icon name="arrow-right" size={16} />
+              <span class="cal__slot" data-cal-slot="out"><small>Check out</small><strong data-cal-out>Add date</strong></span>
+            </div>
+            <button type="button" class="cal__clear link" data-cal-clear>Clear</button>
+          </div>
+        </div>
+
+        <div class="book-guests">
+          <div class="stepper" data-stepper="adults">
+            <div class="stepper__text">
+              <span class="stepper__label">Adults</span>
+              <span class="stepper__hint">Ages 13 and over</span>
+            </div>
+            <div class="stepper__ctrl">
+              <button type="button" data-dec aria-label="Fewer adults"><Icon name="minus" size={16} /></button>
+              <output data-val aria-live="polite">2</output>
+              <button type="button" data-inc aria-label="More adults"><Icon name="plus" size={16} /></button>
+            </div>
+          </div>
+          <div class="stepper" data-stepper="children">
+            <div class="stepper__text">
+              <span class="stepper__label">Children</span>
+              <span class="stepper__hint">Ages 2 to 12</span>
+            </div>
+            <div class="stepper__ctrl">
+              <button type="button" data-dec aria-label="Fewer children"><Icon name="minus" size={16} /></button>
+              <output data-val aria-live="polite">0</output>
+              <button type="button" data-inc aria-label="More children"><Icon name="plus" size={16} /></button>
+            </div>
+          </div>
+          <div class="stepper" data-stepper="units">
+            <div class="stepper__text">
+              <span class="stepper__label" data-units-label>Rooms</span>
+              <span class="stepper__hint" data-units-hint>Up to 2 guests each</span>
+            </div>
+            <div class="stepper__ctrl">
+              <button type="button" data-dec aria-label="Fewer units"><Icon name="minus" size={16} /></button>
+              <output data-val aria-live="polite">1</output>
+              <button type="button" data-inc aria-label="More units"><Icon name="plus" size={16} /></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 3: details & send -->
+      <section class="book__step" data-step="3" aria-label="Your details" hidden>
+        <div class="book-summary" data-book-summary>
+          {
+            stays.map((s) => (
+              <div class="book-summary__img frame" data-summary-img={s.slug} hidden>
+                <Picture src={s.hero.src} alt="" widths={[320, 480]} sizes="160px" formats={["avif", "webp"]} loading="lazy" />
+              </div>
+            ))
+          }
+          <dl class="book-summary__list">
+            <div><dt>Stay</dt><dd data-sum="stay">—</dd></div>
+            <div><dt>Dates</dt><dd data-sum="dates">—</dd></div>
+            <div><dt>Guests</dt><dd data-sum="guests">—</dd></div>
+          </dl>
+        </div>
+
+        <form class="book-form" data-book-form novalidate>
+          <label class="field">
+            <span class="field__label">Your name</span>
+            <input name="name" type="text" autocomplete="name" required placeholder="So we know who to welcome" />
+          </label>
+          <label class="field">
+            <span class="field__label">Phone or WhatsApp number <em>(optional)</em></span>
+            <input name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+91" />
+          </label>
+          <label class="field">
+            <span class="field__label">Anything we should know? <em>(optional)</em></span>
+            <textarea name="note" rows="3" placeholder="Flight times, airport pickup, a cot for the little one…"></textarea>
+          </label>
+          <p class="book-form__note">
+            <Icon name="message-circle" size={16} />
+            <span>This opens WhatsApp with your request written out, so nothing is sent until you press send there. We'll confirm availability and your rate.</span>
+          </p>
+        </form>
+      </section>
+    </div>
+
+    <footer class="book__foot">
+      <p class="book__recap" data-book-recap aria-live="polite"></p>
+      <div class="book__actions">
+        <button type="button" class="btn btn--ghost btn--sm book__back" data-book-back>
+          <span class="btn__label"><span>Back</span><span aria-hidden="true">Back</span></span>
+        </button>
+        <button type="button" class="btn book__next" data-book-next>
+          <span class="btn__label"><span>Continue</span><span aria-hidden="true">Continue</span></span>
+          <Icon name="arrow-right" size={18} class="icon--nudge" />
+        </button>
+        <a class="btn book__send" data-book-send href="#" target="_blank" rel="noopener" hidden>
+          <Icon name="whatsapp" size={18} />
+          <span class="btn__label"><span>Send on WhatsApp</span><span aria-hidden="true">Send on WhatsApp</span></span>
+        </a>
+      </div>
+      <a class="book__mail link" data-book-mail href="#" hidden>Prefer email? Send the same request by email</a>
+    </footer>
+  </div>
+</div>
+
+<script type="application/json" id="book-config" set:html={JSON.stringify(config)} />
+
+<style is:global>
+  .book {
+    position: fixed;
+    inset: 0;
+    z-index: 950;
+    display: flex;
+    justify-content: flex-end;
+    visibility: hidden;
+    transition: visibility 0s linear 0.8s;
+  }
+  .book.is-open {
+    visibility: visible;
+    transition: none;
+  }
+  .book__scrim {
+    position: absolute;
+    inset: 0;
+    background: rgb(26 21 18 / 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    opacity: 0;
+    transition: opacity 0.6s var(--ease-out);
+  }
+  .book.is-open .book__scrim {
+    opacity: 1;
+  }
+  .book__panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: min(620px, 100%);
+    height: 100%;
+    background: var(--cream);
+    color: var(--ink);
+    transform: translateX(100%);
+    transition: transform 0.8s var(--ease-in-out);
+    outline: none;
+    box-shadow: -40px 0 80px -40px rgb(26 21 18 / 0.4);
+  }
+  .book.is-open .book__panel {
+    transform: none;
+  }
+  .book__head {
+    padding: 1.6rem clamp(1.25rem, 4vw, 2.5rem) 1.25rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .book__head-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--brass-text);
+  }
+  .book__close {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    transition:
+      transform 0.5s var(--ease-out),
+      background-color 0.3s;
+  }
+  .book__close:hover {
+    transform: rotate(90deg);
+    background: var(--sand);
+  }
+  .book__title {
+    font-size: clamp(2rem, 1.5rem + 2vw, 2.8rem);
+    line-height: 1;
+    margin: 0.75rem 0 1.25rem;
+  }
+  .book__progress {
+    display: flex;
+    gap: 0.35rem;
+  }
+  .book__progress li {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-top: 0.7rem;
+    border-top: 2px solid var(--line);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--stone);
+    transition:
+      border-color 0.5s var(--ease-out),
+      color 0.5s;
+  }
+  .book__progress li span {
+    font-variant-numeric: tabular-nums;
+    opacity: 0.6;
+  }
+  .book__progress li.is-done,
+  .book__progress li.is-active {
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+  .book__body {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 1.5rem clamp(1.25rem, 4vw, 2.5rem) 2rem;
+  }
+  .book__step.is-entering {
+    animation: step-in 0.6s var(--ease-out) both;
+  }
+  .book__step.is-entering.is-back {
+    animation-name: step-in-back;
+  }
+  @keyframes step-in {
+    from {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+  }
+  @keyframes step-in-back {
+    from {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+  }
+
+  /* Step 1 */
+  .book-stays {
+    border: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.85rem;
+  }
+  .book-stay {
+    position: relative;
+    display: grid;
+    grid-template-columns: 96px 1fr auto;
+    align-items: center;
+    gap: 1.1rem;
+    padding: 0.75rem;
+    padding-right: 1.1rem;
+    border-radius: var(--radius-m);
+    background: var(--paper);
+    box-shadow: inset 0 0 0 1px var(--line);
+    cursor: pointer;
+    transition:
+      box-shadow 0.35s var(--ease-out),
+      background-color 0.35s,
+      transform 0.35s var(--ease-out);
+  }
+  .book-stay:hover {
+    transform: translateY(-2px);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+  }
+  .book-stay:has(input:checked) {
+    background: var(--tint);
+    box-shadow: inset 0 0 0 2px var(--accent);
+  }
+  .book-stay:has(input:focus-visible) {
+    outline: 2px solid var(--brass);
+    outline-offset: 3px;
+  }
+  .book-stay__img {
+    width: 96px;
+    height: 112px;
+    border-radius: var(--arch);
+  }
+  .book-stay__text {
+    display: grid;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+  .book-stay__kind {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .book-stay__name {
+    font-size: 1.65rem;
+    line-height: 1.05;
+  }
+  .book-stay__meta,
+  .book-stay__best {
+    font-size: 0.82rem;
+    color: var(--stone);
+    line-height: 1.4;
+  }
+  .book-stay__best {
+    color: var(--ink-3);
+    font-weight: 600;
+  }
+  .book-stay__tick {
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    color: transparent;
+    transition:
+      background-color 0.3s,
+      color 0.3s,
+      transform 0.4s var(--ease-spring);
+  }
+  .book-stay:has(input:checked) .book-stay__tick {
+    background: var(--accent);
+    color: var(--cream);
+    box-shadow: none;
+    transform: scale(1.1);
+  }
+
+  /* Step 2: calendar */
+  .cal__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .cal__status {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .cal__navs {
+    display: flex;
+    gap: 0.4rem;
+  }
+  .cal__nav {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    transition: background-color 0.3s;
+  }
+  .cal__nav:hover:not(:disabled) {
+    background: var(--sand);
+  }
+  .cal__nav:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+  .cal__months {
+    display: grid;
+    grid-template-columns: repeat(var(--cal-months, 1), 1fr);
+    gap: 1.75rem;
+  }
+  .cal-month__title {
+    font-family: var(--serif);
+    font-size: 1.45rem;
+    margin-bottom: 0.6rem;
+  }
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    row-gap: 2px;
+  }
+  .cal-grid__dow {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--stone);
+    text-align: center;
+    padding-bottom: 0.5rem;
+  }
+  .cal-day {
+    position: relative;
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    border-radius: 50%;
+    isolation: isolate;
+    transition: color 0.2s;
+  }
+  .cal-day::before {
+    /* range band */
+    content: "";
+    position: absolute;
+    inset: 8% 0;
+    z-index: -2;
+    background: transparent;
+  }
+  .cal-day::after {
+    /* selection disc */
+    content: "";
+    position: absolute;
+    inset: 4%;
+    z-index: -1;
+    border-radius: 50%;
+    transition:
+      background-color 0.2s,
+      transform 0.3s var(--ease-spring);
+    transform: scale(0.6);
+  }
+  .cal-day:not(:disabled):hover::after {
+    background: var(--sand);
+    transform: scale(1);
+  }
+  .cal-day:disabled {
+    color: rgb(26 21 18 / 0.25);
+    cursor: default;
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+  }
+  .cal-day.is-today {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .cal-day.in-range::before,
+  .cal-day.is-start.has-range::before,
+  .cal-day.is-end::before {
+    background: var(--sand);
+  }
+  .cal-day.is-start.has-range::before {
+    left: 50%;
+  }
+  .cal-day.is-end::before {
+    right: 50%;
+  }
+  .cal-day.is-start::after,
+  .cal-day.is-end::after {
+    background: var(--ink);
+    transform: scale(1);
+  }
+  .cal-day.is-start,
+  .cal-day.is-end {
+    color: var(--cream);
+  }
+  .cal-day.is-start:hover::after,
+  .cal-day.is-end:hover::after {
+    background: var(--ink);
+  }
+  .cal-day--blank {
+    pointer-events: none;
+  }
+  .cal__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1.25rem;
+    padding: 1rem 1.1rem;
+    border-radius: var(--radius-m);
+    background: var(--paper);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .cal__pair {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--stone);
+  }
+  .cal__slot {
+    display: grid;
+    line-height: 1.25;
+  }
+  .cal__slot small {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .cal__slot strong {
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+  .cal__clear {
+    font-size: 0.85rem;
+  }
+  .book-guests {
+    display: grid;
+    margin-top: 1.75rem;
+    border-top: 1px solid var(--line);
+  }
+  .stepper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .stepper__text {
+    display: grid;
+    line-height: 1.3;
+  }
+  .stepper__label {
+    font-weight: 700;
+  }
+  .stepper__hint {
+    font-size: 0.82rem;
+    color: var(--stone);
+  }
+  .stepper__ctrl {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+  }
+  .stepper__ctrl button {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    transition:
+      background-color 0.3s,
+      opacity 0.3s;
+  }
+  .stepper__ctrl button:hover:not(:disabled) {
+    background: var(--ink);
+    color: var(--cream);
+  }
+  .stepper__ctrl button:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+  .stepper__ctrl output {
+    min-width: 1.6ch;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.05rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Step 3 */
+  .book-summary {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 1.25rem;
+    align-items: center;
+    padding: 1rem;
+    border-radius: var(--radius-m);
+    background: var(--paper);
+    box-shadow: inset 0 0 0 1px var(--line);
+    margin-bottom: 1.75rem;
+  }
+  .book-summary__img {
+    width: 110px;
+    height: 128px;
+    border-radius: var(--arch);
+  }
+  .book-summary__list {
+    display: grid;
+    gap: 0.6rem;
+  }
+  .book-summary__list div {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr;
+    gap: 0.75rem;
+    align-items: baseline;
+  }
+  .book-summary__list dt {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--stone);
+  }
+  .book-summary__list dd {
+    font-weight: 600;
+    line-height: 1.35;
+  }
+  .book-form {
+    display: grid;
+    gap: 1.1rem;
+  }
+  .field {
+    display: grid;
+    gap: 0.45rem;
+  }
+  .field__label {
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+  .field__label em {
+    font-style: normal;
+    font-weight: 500;
+    color: var(--stone);
+  }
+  .field input,
+  .field textarea {
+    width: 100%;
+    padding: 0.95rem 1.1rem;
+    border-radius: var(--radius-s);
+    border: 1px solid var(--line-strong);
+    background: var(--paper);
+    transition:
+      border-color 0.3s,
+      box-shadow 0.3s;
+    resize: vertical;
+  }
+  .field input::placeholder,
+  .field textarea::placeholder {
+    color: rgb(26 21 18 / 0.4);
+  }
+  .field input:focus,
+  .field textarea:focus {
+    outline: none;
+    border-color: var(--ink);
+    box-shadow: 0 0 0 3px rgb(176 138 88 / 0.35);
+  }
+  .field.is-invalid input {
+    border-color: #a4332f;
+    box-shadow: 0 0 0 3px rgb(164 51 47 / 0.15);
+  }
+  .book-form__note {
+    display: flex;
+    gap: 0.6rem;
+    font-size: 0.82rem;
+    color: var(--stone);
+    line-height: 1.5;
+  }
+  .book-form__note .icon {
+    flex: none;
+    margin-top: 0.2rem;
+  }
+
+  /* Footer */
+  .book__foot {
+    display: grid;
+    gap: 0.9rem;
+    padding: 1.1rem clamp(1.25rem, 4vw, 2.5rem) 1.4rem;
+    border-top: 1px solid var(--line);
+    background: var(--paper);
+  }
+  .book__recap {
+    font-size: 0.85rem;
+    color: var(--stone);
+    min-height: 1.3em;
+  }
+  .book__recap strong {
+    color: var(--ink);
+  }
+  .book__actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+  }
+  .book__actions .book__next,
+  .book__actions .book__send {
+    flex: 1;
+  }
+  .book__back[hidden] + .book__next {
+    flex: 1;
+  }
+  .book__send {
+    --btn-bg: #1d6b45;
+    --btn-fg: #fff;
+    --btn-fill: var(--ink);
+    --btn-fill-fg: var(--cream);
+  }
+  .book__mail {
+    justify-self: center;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--stone);
+  }
+  .book.is-shake .book__next {
+    animation: shake 0.45s var(--ease-out);
+  }
+  @keyframes shake {
+    20%,
+    60% {
+      transform: translateX(-6px);
+    }
+    40%,
+    80% {
+      transform: translateX(6px);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .book__panel {
+      width: 100%;
+      height: 100%;
+      transform: translateY(100%);
+    }
+    .book-stay {
+      grid-template-columns: 76px 1fr auto;
+      gap: 0.85rem;
+    }
+    .book-stay__img {
+      width: 76px;
+      height: 92px;
+    }
+    .book-stay__name {
+      font-size: 1.4rem;
+    }
+    .book-stay__meta {
+      display: none;
+    }
+    .book-summary {
+      grid-template-columns: 84px 1fr;
+    }
+    .book-summary__img {
+      width: 84px;
+      height: 100px;
+    }
+    .cal__foot {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .cal__pair {
+      justify-content: space-between;
+    }
+    .book__progress li {
+      font-size: 0;
+      gap: 0;
+    }
+    .book__progress li span {
+      font-size: 0.72rem;
+    }
+  }
+</style>

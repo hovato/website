@@ -1,0 +1,176 @@
+---
+import { Font } from "astro:assets";
+import "../styles/global.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import BookingDrawer from "../components/BookingDrawer.astro";
+import MobileDock from "../components/MobileDock.astro";
+import Intro from "../components/Intro.astro";
+import { site } from "../data/site";
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Path under /public for the social card, e.g. "/og/home.jpg". */
+  ogImage?: string;
+  headerTheme?: "light" | "dark";
+  /** Play the first-visit intro (home page only). */
+  intro?: boolean;
+  /** Per-page accent, used on stay pages. */
+  theme?: { accent: string; tint: string; deep: string };
+  dock?: { staySlug?: string; label?: string };
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const {
+  title,
+  description = site.description,
+  ogImage = "/og/home.jpg",
+  headerTheme = "light",
+  intro = false,
+  theme,
+  dock,
+  jsonLd,
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogUrl = new URL(ogImage, Astro.site);
+const themeStyle = theme ? `--accent:${theme.accent};--accent-tint:${theme.tint};--accent-deep:${theme.deep};` : undefined;
+---
+
+<!doctype html>
+<html lang="en-IN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#1a1512" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="en_IN" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <Font cssVariable="--font-display" preload />
+    <Font cssVariable="--font-sans" preload />
+
+    <script is:inline define:vars={{ intro }}>
+      (function () {
+        var d = document.documentElement;
+        d.classList.add("js");
+        var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        try {
+          if (intro && !reduce && !sessionStorage.getItem("hovato:intro")) d.classList.add("has-intro");
+        } catch (e) {}
+        // Safety net: if the animation script never runs, show everything.
+        window.__revealTimer = setTimeout(function () {
+          d.classList.add("reveal-all");
+          d.classList.remove("has-intro");
+        }, 4500);
+      })();
+    </script>
+
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+  </head>
+
+  <body style={themeStyle}>
+    <a class="skip-link" href="#main">Skip to content</a>
+    {intro && <Intro />}
+    <Header theme={headerTheme} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <BookingDrawer />
+    <MobileDock {...dock} />
+    <div class="cursor" data-cursor aria-hidden="true"><span class="cursor__label" data-cursor-label></span></div>
+
+    <script>
+      import "../scripts/main";
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  /* Custom cursor (fine pointers only) */
+  .cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9800;
+    width: 10px;
+    height: 10px;
+    margin: -5px 0 0 -5px;
+    border-radius: 50%;
+    background: var(--ink);
+    pointer-events: none;
+    display: grid;
+    place-items: center;
+    opacity: 0;
+    transition:
+      width 0.45s var(--ease-out),
+      height 0.45s var(--ease-out),
+      margin 0.45s var(--ease-out),
+      background-color 0.3s,
+      opacity 0.3s;
+    will-change: transform;
+  }
+  .cursor.is-active {
+    opacity: 1;
+  }
+  .cursor.on-dark {
+    background: var(--cream);
+  }
+  .cursor.is-link {
+    width: 44px;
+    height: 44px;
+    margin: -22px 0 0 -22px;
+    background: rgb(176 138 88 / 0.35);
+    backdrop-filter: blur(2px);
+  }
+  .cursor.has-label {
+    width: 92px;
+    height: 92px;
+    margin: -46px 0 0 -46px;
+    background: var(--cream);
+  }
+  .cursor.has-label.on-dark {
+    background: var(--cream);
+  }
+  .cursor__label {
+    font-size: 0.66rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink);
+    opacity: 0;
+    transform: scale(0.6);
+    transition:
+      opacity 0.3s,
+      transform 0.45s var(--ease-out);
+    white-space: nowrap;
+  }
+  .cursor.has-label .cursor__label {
+    opacity: 1;
+    transform: none;
+  }
+  .cursor.is-down {
+    transform-origin: center;
+  }
+  @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+    .cursor {
+      display: none;
+    }
+  }
+</style>

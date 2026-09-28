@@ -1,0 +1,39 @@
+---
+import Base from "../layouts/Base.astro";
+import Button from "../components/Button.astro";
+import { stays } from "../data/stays";
+---
+
+<Base title="Page not found | Hovato" description="This page has checked out." headerTheme="dark">
+  <section class="nf wrap">
+    <p class="eyebrow eyebrow--rule">Error 404</p>
+    <h1 class="display-xl">This room has <em>checked out.</em></h1>
+    <p class="lede muted">The page you were looking for isn't here. One of these might be what you need.</p>
+    <div class="nf__links">
+      <Button href="/" icon="arrow-right">Back to home</Button>
+      {stays.map((s) => <Button href={`/stays/${s.slug}/`} variant="ghost">{s.name}</Button>)}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf {
+    min-height: 90svh;
+    display: grid;
+    align-content: center;
+    justify-items: start;
+    gap: 1.75rem;
+    padding-block: calc(var(--header-h) + 4rem) 5rem;
+  }
+  .nf h1 {
+    max-width: 12ch;
+  }
+  .nf .lede {
+    max-width: 44ch;
+  }
+  .nf__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+</style>

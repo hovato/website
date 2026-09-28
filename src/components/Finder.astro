@@ -1,0 +1,207 @@
+---
+import { Picture } from "astro:assets";
+import Button from "./Button.astro";
+import { occasions } from "../data/home";
+import { staysBySlug } from "../data/stays";
+---
+
+<section class="finder section section--paper" id="finder" aria-labelledby="finder-title" data-finder>
+  <div class="wrap finder__grid">
+    <div class="finder__ask">
+      <p class="eyebrow eyebrow--rule" data-reveal>Find your stay</p>
+      <h2 class="h2" id="finder-title" data-split>What brings you <em>to Kochi?</em></h2>
+      <p class="muted finder__intro" data-reveal>Pick the one that sounds most like your trip and we'll point you to the right door.</p>
+      <div class="finder__chips" role="radiogroup" aria-label="Your trip" data-reveal-stagger>
+        {
+          occasions.map((o, i) => (
+            <button
+              type="button"
+              class="finder__chip"
+              role="radio"
+              aria-checked={i === 0 ? "true" : "false"}
+              tabindex={i === 0 ? 0 : -1}
+              data-finder-chip={o.id}
+            >
+              <span class="finder__dot" aria-hidden="true" />
+              {o.label}
+            </button>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="finder__results" aria-live="polite" data-reveal>
+      {
+        occasions.map((o, i) => {
+          const s = staysBySlug[o.stay];
+          return (
+            <article
+              class:list={["finder__result", { "is-active": i === 0 }]}
+              data-finder-result={o.id}
+              style={`--accent:${s.theme.accent};--tint:${s.theme.tint}`}
+              hidden={i !== 0}
+            >
+              <div class="finder__img frame">
+                <Picture src={s.hero.src} alt="" widths={[480, 720, 960]} sizes="(min-width: 900px) 26vw, 80vw" formats={["avif", "webp"]} loading="lazy" />
+              </div>
+              <div class="finder__copy">
+                <p class="finder__we">We'd suggest</p>
+                <h3 class="h3">{s.name}</h3>
+                <p class="finder__kind">
+                  {s.inventory} · {s.areaShort === "Airport" ? "Near the airport" : s.areaShort}
+                </p>
+                <p class="finder__reason">{o.reason}</p>
+                <div class="finder__cta">
+                  <Button href={`/stays/${s.slug}/`} variant="accent" size="sm" icon="arrow-right">
+                    See the stay
+                  </Button>
+                  <Button variant="ghost" size="sm" data-book-open="dates" data-book-stay={s.slug}>
+                    Check dates
+                  </Button>
+                </div>
+              </div>
+            </article>
+          );
+        })
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .finder__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: clamp(2.5rem, 6vw, 7rem);
+    align-items: center;
+  }
+  .finder__ask .h2 {
+    margin: 1.25rem 0 1.25rem;
+    max-width: 9ch;
+  }
+  .finder__intro {
+    max-width: 40ch;
+    margin-bottom: 2rem;
+  }
+  .finder__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+  .finder__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.85rem 1.3rem;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition:
+      background-color 0.35s var(--ease-out),
+      color 0.35s,
+      box-shadow 0.35s;
+  }
+  .finder__chip:hover {
+    box-shadow: inset 0 0 0 1px var(--ink);
+  }
+  .finder__chip[aria-checked="true"] {
+    background: var(--ink);
+    color: var(--cream);
+    box-shadow: none;
+  }
+  .finder__dot {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px currentColor;
+    transition:
+      background-color 0.3s,
+      transform 0.4s var(--ease-spring);
+  }
+  .finder__chip[aria-checked="true"] .finder__dot {
+    background: var(--brass);
+    box-shadow: none;
+    transform: scale(1.25);
+  }
+
+  .finder__results {
+    position: relative;
+    display: grid;
+  }
+  .finder__result {
+    grid-area: 1 / 1;
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
+    gap: clamp(1.25rem, 3vw, 2.5rem);
+    align-items: center;
+    padding: clamp(1rem, 2vw, 1.5rem);
+    border-radius: var(--radius-l);
+    background: var(--tint);
+  }
+  .finder__result:global(.is-entering) {
+    animation: finder-in 0.8s var(--ease-out) both;
+  }
+  @keyframes finder-in {
+    from {
+      opacity: 0;
+      transform: translateY(18px) scale(0.985);
+    }
+  }
+  .finder__img {
+    aspect-ratio: 3 / 4;
+    border-radius: var(--arch);
+  }
+  .finder__result:global(.is-entering) .finder__img :global(img) {
+    animation: finder-img 1.2s var(--ease-out) both;
+  }
+  @keyframes finder-img {
+    from {
+      transform: scale(1.15);
+    }
+  }
+  .finder__copy {
+    display: grid;
+    gap: 0.75rem;
+    padding-right: 1rem;
+  }
+  .finder__we {
+    font-size: var(--fs-micro);
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .finder__kind {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--stone);
+  }
+  .finder__reason {
+    font-size: 1.05rem;
+    line-height: 1.6;
+  }
+  .finder__cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 0.75rem;
+  }
+
+  @media (max-width: 900px) {
+    .finder__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 560px) {
+    .finder__result {
+      grid-template-columns: 1fr;
+    }
+    .finder__img {
+      aspect-ratio: 4 / 3;
+    }
+    .finder__copy {
+      padding: 0 0.5rem 0.75rem;
+    }
+  }
+</style>

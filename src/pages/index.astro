@@ -1,0 +1,39 @@
+---
+import Base from "../layouts/Base.astro";
+import Hero from "../components/Hero.astro";
+import Manifesto from "../components/Manifesto.astro";
+import StaysStack from "../components/StaysStack.astro";
+import Finder from "../components/Finder.astro";
+import Locations from "../components/Locations.astro";
+import Standard from "../components/Standard.astro";
+import Marquee from "../components/Marquee.astro";
+import Nearby from "../components/Nearby.astro";
+import CtaBand from "../components/CtaBand.astro";
+import Faq from "../components/Faq.astro";
+import { faqs } from "../data/home";
+import { stays } from "../data/stays";
+import { homeJsonLd } from "../data/seo";
+import { site } from "../data/site";
+
+const origin = (Astro.site ?? Astro.url).origin;
+---
+
+<Base
+  title={`${site.name} · ${site.descriptor} in Kochi, Kerala`}
+  description={site.description}
+  ogImage="/og/home.jpg"
+  headerTheme="light"
+  intro
+  jsonLd={homeJsonLd(origin, stays)}
+>
+  <Hero />
+  <Manifesto />
+  <StaysStack />
+  <Finder />
+  <Locations />
+  <Standard />
+  <Marquee />
+  <Nearby />
+  <CtaBand />
+  <Faq items={faqs} />
+</Base>

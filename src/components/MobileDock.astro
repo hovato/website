@@ -1,0 +1,80 @@
+---
+import Icon from "./Icon.astro";
+import { site, whatsappHref } from "../data/site";
+
+interface Props {
+  /** Pre-select a stay when booking from this page. */
+  staySlug?: string;
+  label?: string;
+}
+const { staySlug, label = "Book a stay" } = Astro.props;
+---
+
+<div class="dock" data-dock>
+  <a class="dock__icon" href={whatsappHref()} target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+    <Icon name="whatsapp" size={20} />
+  </a>
+  <a class="dock__icon" href={`tel:${site.contact.phone.tel}`} aria-label="Call Hovato">
+    <Icon name="phone" size={19} />
+  </a>
+  <button class="dock__book" type="button" data-book-open="auto" data-book-stay={staySlug}>
+    {label}
+    <Icon name="arrow-right" size={18} />
+  </button>
+</div>
+
+<style>
+  .dock {
+    position: fixed;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: calc(0.75rem + env(safe-area-inset-bottom));
+    z-index: 800;
+    display: none;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 999px;
+    background: rgb(26 21 18 / 0.88);
+    backdrop-filter: blur(14px) saturate(1.4);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    color: var(--cream);
+    box-shadow: 0 18px 40px -12px rgb(26 21 18 / 0.5);
+    transform: translateY(160%);
+    transition: transform 0.7s var(--ease-out);
+  }
+  .dock:global(.is-visible) {
+    transform: none;
+  }
+  :global(html.menu-open) .dock,
+  :global(html.book-open) .dock {
+    transform: translateY(160%);
+  }
+  .dock__icon {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    flex: none;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgb(242 236 227 / 0.25);
+  }
+  .dock__book {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    border-radius: 999px;
+    background: var(--brass);
+    color: var(--ink);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  @media (max-width: 760px) {
+    .dock {
+      display: flex;
+    }
+  }
+</style>

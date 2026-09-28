@@ -1,0 +1,135 @@
+---
+import MapKochi from "./MapKochi.astro";
+import Icon from "./Icon.astro";
+import { stays } from "../data/stays";
+---
+
+<section class="where section" id="where" aria-labelledby="where-title">
+  <div class="wrap where__grid">
+    <div class="where__text">
+      <p class="eyebrow eyebrow--rule" data-reveal>Where we are</p>
+      <h2 class="h2" id="where-title" data-split>Kochi, <em>mapped.</em></h2>
+      <p class="muted where__intro" data-reveal>
+        One stay on the quiet northern edge of the city, two just minutes from Cochin International Airport. Wherever
+        your trip starts, there's a Hovato close by.
+      </p>
+
+      <ol class="where__list" role="list" data-reveal-stagger>
+        {
+          stays.map((s) => (
+            <li>
+              <button
+                type="button"
+                class="where__item"
+                data-map-item={s.slug}
+                style={`--accent:${s.theme.accent}`}
+                aria-describedby={`where-${s.slug}`}
+              >
+                <span class="where__num">{s.index}</span>
+                <span class="where__body">
+                  <span class="where__name serif">{s.name}</span>
+                  <span class="where__area" id={`where-${s.slug}`}>
+                    {s.area}
+                  </span>
+                </span>
+                <span class="where__time">
+                  <Icon name="plane" size={15} />
+                  {s.airportTime.replace("the airport", "COK").replace("from", "to")}
+                </span>
+              </button>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+
+    <div class="where__map" data-reveal>
+      <MapKochi />
+    </div>
+  </div>
+</section>
+
+<style>
+  .where__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: clamp(2.5rem, 6vw, 6rem);
+    align-items: center;
+  }
+  .where__text .h2 {
+    margin: 1.25rem 0;
+  }
+  .where__intro {
+    max-width: 42ch;
+    margin-bottom: 2.5rem;
+  }
+  .where__list {
+    display: grid;
+    border-top: 1px solid var(--line);
+  }
+  .where__item {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 2.5rem 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 0.5rem;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    transition:
+      background-color 0.4s var(--ease-out),
+      padding 0.5s var(--ease-out);
+  }
+  .where__item:hover,
+  .where__item:global(.is-active) {
+    background: var(--paper);
+    padding-left: 1.1rem;
+  }
+  .where__num {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+  }
+  .where__body {
+    display: grid;
+    gap: 0.1rem;
+  }
+  .where__name {
+    font-size: clamp(1.45rem, 1.2rem + 0.8vw, 1.9rem);
+    line-height: 1.1;
+  }
+  .where__area {
+    font-size: 0.86rem;
+    color: var(--stone);
+  }
+  .where__time {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.8rem;
+    border-radius: 999px;
+    background: var(--sand);
+    font-size: 0.76rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .where__item:global(.is-active) .where__time {
+    background: var(--accent);
+    color: var(--cream);
+  }
+  @media (max-width: 960px) {
+    .where__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 480px) {
+    .where__item {
+      grid-template-columns: 2rem 1fr;
+    }
+    .where__time {
+      grid-column: 2;
+      justify-self: start;
+    }
+  }
+</style>

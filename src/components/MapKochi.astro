@@ -1,0 +1,336 @@
+---
+// Illustrated map of the Kochi area. Positions come from real coordinates,
+// projected with x = (lng - 76.14) * 1850 and y = (10.23 - lat) * 1850.
+// It's a picture, not a navigation map, and says so in the corner.
+import { stays } from "../data/stays";
+
+interface Props {
+  /** Highlight a single stay (stay pages). */
+  focus?: string;
+  class?: string;
+}
+const { focus, class: className } = Astro.props;
+
+const towns = [
+  { name: "Angamaly", x: 455, y: 63, anchor: "start", dx: 9, dy: 4 },
+  { name: "Kalady", x: 555, y: 115, anchor: "end", dx: -9, dy: 4 },
+  { name: "Aluva", x: 391, y: 226, anchor: "start", dx: 10, dy: 5 },
+  { name: "Kalamassery", x: 332, y: 327, anchor: "start", dx: 10, dy: 5 },
+  { name: "Edappally", x: 311, y: 381, anchor: "start", dx: 10, dy: 5 },
+  { name: "Kakkanad", x: 385, y: 398, anchor: "start", dx: 9, dy: 4 },
+  { name: "Ernakulam", x: 262, y: 458, anchor: "start", dx: 10, dy: 4 },
+  { name: "Fort Kochi", x: 189, y: 489, anchor: "end", dx: -9, dy: 14 },
+  { name: "Cherai", x: 78, y: 170, anchor: "start", dx: 9, dy: 4 },
+  { name: "Paravur", x: 168, y: 150, anchor: "start", dx: 8, dy: -6 },
+];
+---
+
+<figure class:list={["kmap", className]} data-map data-map-focus={focus}>
+  <svg viewBox="0 0 600 560" role="img" aria-labelledby="kmap-title kmap-desc">
+    <title id="kmap-title">Illustrated map of Hovato stays around Kochi</title>
+    <desc id="kmap-desc">
+      H. Halcyon Suites is in Manjummal, north of Kalamassery. Bohom Stayora and Hovato Brown are close to Cochin
+      International Airport at Nedumbassery.
+    </desc>
+
+    <defs>
+      <pattern id="kmap-dots" width="9" height="9" patternUnits="userSpaceOnUse">
+        <circle cx="1.2" cy="1.2" r="0.9" class="kmap__dot"></circle>
+      </pattern>
+    </defs>
+
+    <!-- Sea -->
+    <path
+      class="kmap__sea"
+      d="M0 0 H74 C62 30 54 62 52 92 C56 120 66 146 72 166 C82 212 90 240 96 262 C108 318 120 372 132 425 C146 452 162 474 180 492 C188 516 194 538 200 560 H0 Z"
+    ></path>
+    <path class="kmap__sea-dots" d="M0 0 H74 C62 30 54 62 52 92 C56 120 66 146 72 166 C82 212 90 240 96 262 C108 318 120 372 132 425 C146 452 162 474 180 492 C188 516 194 538 200 560 H0 Z" fill="url(#kmap-dots)"></path>
+
+    <!-- Backwaters -->
+    <path
+      class="kmap__water"
+      d="M74 96 C92 104 112 116 132 134 C160 160 188 196 212 236 C230 266 244 292 248 322 C254 368 262 420 258 458 C254 486 236 506 214 512 C196 516 184 504 178 492 C170 470 156 450 146 428 C132 380 118 322 104 266 C96 232 86 196 78 160 C74 138 72 116 74 96 Z"
+    ></path>
+
+    <!-- Periyar river -->
+    <path class="kmap__river" d="M600 206 C560 214 520 196 480 210 C448 222 420 212 391 226"></path>
+    <path class="kmap__river" d="M391 226 C360 236 344 262 318 276 C302 284 292 288 276 292 C262 296 252 300 240 304"></path>
+    <path class="kmap__river kmap__river--thin" d="M391 226 C356 214 318 196 280 182 C240 168 204 158 168 150 C140 140 112 118 86 104"></path>
+    <text class="kmap__river-label" x="498" y="226">Periyar</text>
+
+    <!-- Roads: NH 544 and on to the city -->
+    <path class="kmap__road" d="M455 40 L455 63 C452 96 446 120 440 150 C428 180 406 204 391 226 C370 262 350 296 332 327 C322 346 316 364 311 381 C302 410 290 436 272 460"></path>
+    <path class="kmap__road kmap__road--minor" d="M440 150 C450 148 458 146 468 145"></path>
+    <path class="kmap__road kmap__road--minor" d="M311 381 C336 386 360 392 385 398"></path>
+    <path class="kmap__road kmap__road--minor" d="M468 145 C498 134 526 124 555 115"></path>
+
+    <!-- Towns -->
+    {
+      towns.map((t) => (
+        <g class="kmap__town">
+          <circle cx={t.x} cy={t.y} r="2.6" />
+          <text x={t.x + t.dx} y={t.y + t.dy} text-anchor={t.anchor}>
+            {t.name}
+          </text>
+        </g>
+      ))
+    }
+
+    <text class="kmap__sea-label" x="36" y="360" transform="rotate(-72 36 360)">Arabian Sea</text>
+
+    <!-- Routes to the airport (shown when a stay is active) -->
+    {
+      stays.map((s) => (
+        <path class="kmap__route" d={s.route} data-map-route={s.slug} pathLength="1" />
+      ))
+    }
+
+    <!-- Airport -->
+    <g class="kmap__airport" transform="translate(468 145)">
+      <circle r="15" class="kmap__airport-ring"></circle>
+      <circle r="11"></circle>
+      <path
+        class="kmap__plane"
+        d="M-1.2 -6.5 C-1.2 -7.4 1.2 -7.4 1.2 -6.5 L1.2 -2.2 L6.5 1 L6.5 2.5 L1.2 0.9 L1.2 4.2 L2.8 5.4 L2.8 6.5 L0 5.7 L-2.8 6.5 L-2.8 5.4 L-1.2 4.2 L-1.2 0.9 L-6.5 2.5 L-6.5 1 L-1.2 -2.2 Z"
+      ></path>
+      <text x="-22" y="-8" text-anchor="end" class="kmap__airport-label">Cochin Int’l Airport</text>
+    </g>
+
+    <!-- Stay pins -->
+    {
+      stays.map((s) => (
+        <g
+          class="kmap__pin"
+          data-map-pin={s.slug}
+          transform={`translate(${s.pin.x} ${s.pin.y})`}
+          style={`--pin:${s.theme.accent}`}
+          tabindex="0"
+          role="button"
+          aria-label={`${s.name}, ${s.area}`}
+        >
+          <circle class="kmap__pulse" r="12" />
+          <circle class="kmap__pin-dot" r="12" />
+          <text class="kmap__pin-num" y="4" text-anchor="middle">
+            {s.index}
+          </text>
+          <g class="kmap__tag" transform={s.slug === "halcyon-suites" ? "translate(-18 0)" : s.slug === "bohom-stayora" ? "translate(-18 18)" : "translate(18 18)"}>
+            <text
+              class="kmap__tag-text"
+              text-anchor={s.slug === "hovato-brown" ? "start" : "end"}
+              y={s.slug === "halcyon-suites" ? 4 : 10}
+            >
+              {s.name}
+            </text>
+          </g>
+        </g>
+      ))
+    }
+
+    <!-- Compass -->
+    <g class="kmap__compass" transform="translate(560 510)">
+      <circle r="16"></circle>
+      <path d="M0 -11 L4 2 L0 0 L-4 2 Z"></path>
+      <text y="-20" text-anchor="middle">N</text>
+    </g>
+  </svg>
+  <figcaption class="kmap__note">Illustrative map · not to scale</figcaption>
+</figure>
+
+<style>
+  .kmap {
+    --land: #ece4d8;
+    --sea: #d5ddd8;
+    --water: #c9d6d1;
+    --road: #b9a78f;
+    position: relative;
+    border-radius: var(--radius-l);
+    background: var(--land);
+    overflow: hidden;
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .kmap svg {
+    width: 100%;
+    height: auto;
+  }
+  .kmap__sea {
+    fill: var(--sea);
+  }
+  .kmap__dot {
+    fill: rgb(47 74 68 / 0.18);
+  }
+  .kmap__water {
+    fill: var(--water);
+  }
+  .kmap__river {
+    fill: none;
+    stroke: var(--water);
+    stroke-width: 7;
+    stroke-linecap: round;
+  }
+  .kmap__river--thin {
+    stroke-width: 4.5;
+  }
+  .kmap__river-label,
+  .kmap__sea-label {
+    font-family: var(--serif);
+    font-style: italic;
+    fill: rgb(47 74 68 / 0.75);
+  }
+  .kmap__river-label {
+    font-size: 15px;
+  }
+  .kmap__sea-label {
+    font-size: 22px;
+    letter-spacing: 0.04em;
+  }
+  .kmap__road {
+    fill: none;
+    stroke: var(--road);
+    stroke-width: 2.2;
+    stroke-dasharray: 1 0;
+    stroke-linecap: round;
+  }
+  .kmap__road--minor {
+    stroke-width: 1.4;
+    stroke-dasharray: 4 4;
+  }
+  .kmap__town circle {
+    fill: var(--ink-3);
+  }
+  .kmap__town text {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    fill: var(--ink-3);
+  }
+  .kmap__airport > circle {
+    fill: var(--ink);
+  }
+  .kmap__airport-ring {
+    fill: none !important;
+    stroke: var(--ink);
+    stroke-opacity: 0.25;
+    stroke-width: 1;
+  }
+  .kmap__plane {
+    fill: var(--cream);
+  }
+  .kmap__airport-label {
+    paint-order: stroke;
+    stroke: var(--land);
+    stroke-width: 4px;
+    stroke-linejoin: round;
+    font-family: var(--sans);
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    fill: var(--ink);
+  }
+  .kmap__route {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    opacity: 0;
+    transition:
+      stroke-dashoffset 1.2s var(--ease-in-out),
+      opacity 0.3s;
+  }
+  .kmap__route:global(.is-active) {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  .kmap__pin {
+    cursor: pointer;
+    outline: none;
+  }
+  .kmap__pin-dot,
+  .kmap__pulse {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .kmap__pin-dot {
+    fill: var(--pin);
+    stroke: var(--cream);
+    stroke-width: 2.5;
+    transition: transform 0.5s var(--ease-spring);
+  }
+  .kmap__pulse {
+    fill: var(--pin);
+    opacity: 0.35;
+    animation: kmap-pulse 2.4s var(--ease-out) infinite;
+  }
+  @keyframes kmap-pulse {
+    from {
+      transform: scale(1);
+      opacity: 0.4;
+    }
+    to {
+      transform: scale(2.6);
+      opacity: 0;
+    }
+  }
+  .kmap__pin-num {
+    font-family: var(--sans);
+    font-size: 9.5px;
+    font-weight: 800;
+    fill: var(--cream);
+    pointer-events: none;
+  }
+  .kmap__tag-text {
+    font-family: var(--serif);
+    font-size: 17px;
+    fill: var(--ink);
+    paint-order: stroke;
+    stroke: var(--land);
+    stroke-width: 5px;
+    stroke-linejoin: round;
+    opacity: 0;
+    transition: opacity 0.35s var(--ease-out);
+  }
+  .kmap__pin:global(.is-active) .kmap__pin-dot,
+  .kmap__pin:hover .kmap__pin-dot,
+  .kmap__pin:focus-visible .kmap__pin-dot {
+    transform: scale(1.25);
+  }
+  .kmap__pin:global(.is-active) .kmap__tag-text,
+  .kmap__pin:hover .kmap__tag-text,
+  .kmap__pin:focus-visible .kmap__tag-text {
+    opacity: 1;
+  }
+  .kmap__compass circle {
+    fill: none;
+    stroke: var(--ink-3);
+    stroke-opacity: 0.4;
+  }
+  .kmap__compass path {
+    fill: var(--ink-3);
+  }
+  .kmap__compass text {
+    font-family: var(--sans);
+    font-size: 10px;
+    font-weight: 800;
+    fill: var(--ink-3);
+  }
+  .kmap__note {
+    position: absolute;
+    left: 1.1rem;
+    bottom: 0.9rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--stone);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .kmap__pulse {
+      animation: none;
+      opacity: 0;
+    }
+  }
+</style>

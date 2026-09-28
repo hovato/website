@@ -1,0 +1,124 @@
+---
+import Button from "./Button.astro";
+
+interface Props {
+  /** Pre-select this stay when the drawer opens (stay pages). */
+  staySlug?: string;
+  stayName?: string;
+  class?: string;
+}
+const { staySlug, stayName, class: className } = Astro.props;
+---
+
+<div class:list={["bookbar", className]} data-bookbar>
+  {
+    !staySlug && (
+      <button class="bookbar__field" type="button" data-book-open="stay">
+        <span class="bookbar__label">Stay</span>
+        <span class="bookbar__value" data-book-value="stay">Any Hovato stay</span>
+      </button>
+    )
+  }
+  {
+    staySlug && (
+      <div class="bookbar__field bookbar__field--static">
+        <span class="bookbar__label">Stay</span>
+        <span class="bookbar__value">{stayName}</span>
+      </div>
+    )
+  }
+  <button class="bookbar__field" type="button" data-book-open="dates" data-book-stay={staySlug}>
+    <span class="bookbar__label">Check in — out</span>
+    <span class="bookbar__value" data-book-value="dates">Add dates</span>
+  </button>
+  <button class="bookbar__field bookbar__field--guests" type="button" data-book-open="dates" data-book-stay={staySlug}>
+    <span class="bookbar__label">Guests</span>
+    <span class="bookbar__value" data-book-value="guests">2 adults</span>
+  </button>
+  <Button variant="brass" class="bookbar__go" icon="arrow-right" data-book-open="auto" data-book-stay={staySlug}>
+    Check availability
+  </Button>
+</div>
+
+<style>
+  .bookbar {
+    display: grid;
+    grid-template-columns: 1.2fr 1.2fr 0.9fr auto;
+    align-items: stretch;
+    gap: 0.35rem;
+    padding: 0.4rem;
+    border-radius: 999px;
+    background: rgb(242 236 227 / 0.14);
+    backdrop-filter: blur(18px) saturate(1.3);
+    -webkit-backdrop-filter: blur(18px) saturate(1.3);
+    box-shadow:
+      inset 0 0 0 1px rgb(242 236 227 / 0.28),
+      0 30px 60px -30px rgb(0 0 0 / 0.5);
+    color: var(--on-dark);
+  }
+  .bookbar__field {
+    display: grid;
+    align-content: center;
+    gap: 0.15rem;
+    padding: 0.7rem 1.5rem;
+    border-radius: 999px;
+    text-align: left;
+    min-width: 0;
+    transition: background-color 0.3s var(--ease-out);
+  }
+  button.bookbar__field:hover {
+    background: rgb(242 236 227 / 0.14);
+  }
+  .bookbar__field + .bookbar__field {
+    position: relative;
+  }
+  .bookbar__field + .bookbar__field::before {
+    content: "";
+    position: absolute;
+    left: -0.2rem;
+    top: 25%;
+    bottom: 25%;
+    width: 1px;
+    background: rgb(242 236 227 / 0.25);
+  }
+  .bookbar__label {
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    opacity: 0.75;
+  }
+  .bookbar__value {
+    font-weight: 600;
+    font-size: 0.98rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .bookbar :global(.bookbar__go) {
+    min-height: 3.8rem;
+  }
+
+  @media (max-width: 900px) {
+    .bookbar {
+      grid-template-columns: 1fr 1fr;
+      border-radius: var(--radius-l);
+      padding: 0.5rem;
+    }
+    .bookbar__field {
+      border-radius: var(--radius-m);
+      padding: 0.6rem 1rem;
+    }
+    .bookbar__field--guests,
+    .bookbar__field--static {
+      display: none;
+    }
+    .bookbar__field + .bookbar__field::before {
+      display: none;
+    }
+    .bookbar :global(.bookbar__go) {
+      grid-column: 1 / -1;
+      min-height: 3.3rem;
+    }
+  }
+</style>

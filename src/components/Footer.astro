@@ -1,0 +1,242 @@
+---
+import Logo from "./Logo.astro";
+import Icon from "./Icon.astro";
+import { stays } from "../data/stays";
+import { site, whatsappHref, mailHref } from "../data/site";
+
+const year = new Date().getFullYear();
+const letters = "HOVATO".split("");
+---
+
+<footer class="site-footer" data-footer>
+  <div class="wrap">
+    <div class="site-footer__grid">
+      <div class="site-footer__brand">
+        <Logo />
+        <p class="site-footer__tagline serif">Where better stays create <em>greater value.</em></p>
+        <p class="site-footer__desc">
+          {site.descriptor} in {site.region}: serviced apartments in Manjummal, plus rooms and a private
+          apartment near Cochin International Airport.
+        </p>
+      </div>
+
+      <nav class="site-footer__col" aria-label="Our stays">
+        <p class="site-footer__head">Stays</p>
+        <ul role="list">
+          {
+            stays.map((s) => (
+              <li>
+                <a class="link" href={`/stays/${s.slug}/`}>{s.name}</a>
+                <span class="site-footer__sub">{s.areaShort === "Airport" ? "Near COK airport" : s.area}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <nav class="site-footer__col" aria-label="Explore">
+        <p class="site-footer__head">Hovato</p>
+        <ul role="list">
+          <li><a class="link" href="/#standard">The Hovato standard</a></li>
+          <li><a class="link" href="/#finder">Find your stay</a></li>
+          <li><a class="link" href="/#explore">Explore Kochi</a></li>
+          <li><a class="link" href="/#faq">Questions</a></li>
+          <li><button class="link" type="button" data-book-open="auto">Book a stay</button></li>
+        </ul>
+      </nav>
+
+      <div class="site-footer__col" id="footer-contact">
+        <p class="site-footer__head">Talk to us</p>
+        <ul role="list" class="site-footer__contact">
+          <li>
+            <a class="link" href={whatsappHref()} target="_blank" rel="noopener"><Icon name="whatsapp" size={16} /> WhatsApp</a>
+          </li>
+          <li>
+            <a class="link" href={`tel:${site.contact.phone.tel}`}><Icon name="phone" size={16} /> {site.contact.phone.display}</a>
+          </li>
+          <li>
+            <a class="link" href={mailHref()}><Icon name="mail" size={16} /> {site.contact.email}</a>
+          </li>
+        </ul>
+        {
+          (site.social.instagram || site.social.facebook) && (
+            <div class="site-footer__social">
+              {site.social.instagram && (
+                <a href={site.social.instagram} target="_blank" rel="noopener" aria-label="Hovato on Instagram">
+                  <Icon name="instagram" size={18} />
+                </a>
+              )}
+              {site.social.facebook && (
+                <a href={site.social.facebook} target="_blank" rel="noopener" aria-label="Hovato on Facebook">
+                  <Icon name="facebook" size={18} />
+                </a>
+              )}
+            </div>
+          )
+        }
+      </div>
+    </div>
+
+    <p class="site-footer__word serif" aria-hidden="true" data-footer-word>
+      {letters.map((l) => <span>{l}</span>)}
+    </p>
+
+    <div class="site-footer__base">
+      <p>© {year} {site.legalName}. All rights reserved.</p>
+      <p class="site-footer__base-mid">{site.descriptor} · {site.region}</p>
+      <button class="site-footer__top" type="button" data-to-top>
+        Back to top <Icon name="arrow-down" size={14} class="site-footer__top-icon" />
+      </button>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    position: relative;
+    background: var(--ink);
+    color: var(--on-dark);
+    padding-top: clamp(4.5rem, 3rem + 5vw, 8rem);
+    overflow: hidden;
+  }
+  .site-footer__grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr 1.2fr;
+    gap: clamp(2rem, 4vw, 4rem);
+    padding-bottom: clamp(3rem, 6vw, 6rem);
+    border-bottom: 1px solid var(--line-dark);
+  }
+  .site-footer__brand {
+    display: grid;
+    align-content: start;
+    gap: 1.4rem;
+    font-size: 1rem;
+  }
+  .site-footer__tagline {
+    font-size: clamp(1.9rem, 1.4rem + 1.6vw, 2.8rem);
+    line-height: 1.02;
+    max-width: 14ch;
+  }
+  .site-footer__desc {
+    max-width: 38ch;
+    color: var(--on-dark-muted);
+    font-size: 0.92rem;
+  }
+  .site-footer__head {
+    font-size: var(--fs-micro);
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--brass);
+    margin-bottom: 1.4rem;
+  }
+  .site-footer__col ul {
+    display: grid;
+    gap: 0.9rem;
+  }
+  .site-footer__col li {
+    display: grid;
+    gap: 0.1rem;
+  }
+  .site-footer__col .link {
+    justify-self: start;
+    font-weight: 500;
+  }
+  .site-footer__sub {
+    font-size: 0.8rem;
+    color: var(--on-dark-muted);
+  }
+  .site-footer__contact .link {
+    gap: 0.65rem;
+  }
+  .site-footer__social {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 1.5rem;
+  }
+  .site-footer__social a {
+    display: grid;
+    place-items: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px var(--line-dark);
+    transition:
+      background-color 0.3s,
+      color 0.3s;
+  }
+  .site-footer__social a:hover {
+    background: var(--cream);
+    color: var(--ink);
+  }
+  .site-footer__word {
+    display: flex;
+    justify-content: space-between;
+    font-size: clamp(5rem, 22.5vw, 22rem);
+    line-height: 0.8;
+    letter-spacing: 0;
+    padding-top: 0.12em;
+    margin-inline: -0.02em;
+    color: transparent;
+    -webkit-text-stroke: 1px rgb(242 236 227 / 0.28);
+    user-select: none;
+  }
+  .site-footer__word span {
+    display: inline-block;
+  }
+  .site-footer__base {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1rem;
+    align-items: center;
+    padding-block: 1.75rem 2rem;
+    border-top: 1px solid var(--line-dark);
+    font-size: 0.8rem;
+    color: var(--on-dark-muted);
+  }
+  .site-footer__base-mid {
+    text-align: center;
+  }
+  .site-footer__top {
+    justify-self: end;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: var(--on-dark);
+  }
+  .site-footer__top :global(.site-footer__top-icon) {
+    transform: rotate(180deg);
+    transition: transform 0.5s var(--ease-out);
+  }
+  .site-footer__top:hover :global(.site-footer__top-icon) {
+    transform: rotate(180deg) translateY(3px);
+  }
+
+  @media (max-width: 1000px) {
+    .site-footer__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .site-footer__brand {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (max-width: 560px) {
+    .site-footer__grid {
+      grid-template-columns: 1fr;
+    }
+    .site-footer__base {
+      grid-template-columns: 1fr;
+      text-align: left;
+    }
+    .site-footer__base-mid {
+      text-align: left;
+    }
+    .site-footer__top {
+      justify-self: start;
+    }
+    .site-footer__word {
+      -webkit-text-stroke-width: 0.75px;
+    }
+  }
+</style>

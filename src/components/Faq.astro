@@ -1,0 +1,238 @@
+---
+import Icon from "./Icon.astro";
+import { site, whatsappHref, mailHref } from "../data/site";
+
+interface Props {
+  items: { q: string; a: string }[];
+  title?: string;
+  id?: string;
+  showContact?: boolean;
+}
+const { items, id = "faq", showContact = true } = Astro.props;
+---
+
+<section class="faq section" id={id} aria-labelledby={`${id}-title`}>
+  <div class="wrap faq__grid">
+    <div class="faq__side">
+      <p class="eyebrow eyebrow--rule" data-reveal>Good to know</p>
+      <h2 class="h2" id={`${id}-title`} data-split>Questions, <em>answered.</em></h2>
+
+      {
+        showContact && (
+          <div class="faq__contact" id="contact" data-reveal>
+            <p class="faq__contact-title serif">Still wondering?</p>
+            <p class="muted">Our hosts are one message away, day or night.</p>
+            <ul role="list">
+              <li>
+                <a href={whatsappHref()} target="_blank" rel="noopener">
+                  <span class="faq__contact-icon faq__contact-icon--wa"><Icon name="whatsapp" size={18} /></span>
+                  <span>
+                    <small>WhatsApp</small>
+                    Start a chat
+                  </span>
+                  <Icon name="arrow-up-right" size={18} class="faq__go" />
+                </a>
+              </li>
+              <li>
+                <a href={`tel:${site.contact.phone.tel}`}>
+                  <span class="faq__contact-icon"><Icon name="phone" size={18} /></span>
+                  <span>
+                    <small>Call</small>
+                    {site.contact.phone.display}
+                  </span>
+                  <Icon name="arrow-up-right" size={18} class="faq__go" />
+                </a>
+              </li>
+              <li>
+                <a href={mailHref()}>
+                  <span class="faq__contact-icon"><Icon name="mail" size={18} /></span>
+                  <span>
+                    <small>Email</small>
+                    {site.contact.email}
+                  </span>
+                  <Icon name="arrow-up-right" size={18} class="faq__go" />
+                </a>
+              </li>
+            </ul>
+          </div>
+        )
+      }
+    </div>
+
+    <div class="faq__list" data-reveal-stagger>
+      {
+        items.map((f, i) => (
+          <details class="faq__item" name={`${id}-group`} open={i === 0}>
+            <summary>
+              <span class="faq__q">{f.q}</span>
+              <span class="faq__toggle" aria-hidden="true" />
+            </summary>
+            <div class="faq__a">
+              <p>{f.a}</p>
+            </div>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: clamp(2.5rem, 6vw, 7rem);
+    align-items: start;
+  }
+  .faq__side .h2 {
+    margin: 1.25rem 0 2.5rem;
+  }
+  .faq__contact {
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    border-radius: var(--radius-l);
+    background: var(--paper);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .faq__contact-title {
+    font-size: 1.9rem;
+    line-height: 1.1;
+  }
+  .faq__contact > .muted {
+    margin: 0.35rem 0 1.25rem;
+  }
+  .faq__contact ul {
+    display: grid;
+  }
+  .faq__contact a {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.9rem 0;
+    border-top: 1px solid var(--line);
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .faq__contact small {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--stone);
+  }
+  .faq__contact-icon {
+    display: grid;
+    place-items: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 50%;
+    background: var(--sand);
+    transition:
+      background-color 0.3s,
+      color 0.3s;
+  }
+  .faq__contact a:hover .faq__contact-icon {
+    background: var(--ink);
+    color: var(--cream);
+  }
+  .faq__contact a:hover .faq__contact-icon--wa {
+    background: #25d366;
+    color: #fff;
+  }
+  .faq__contact :global(.faq__go) {
+    color: var(--stone);
+    transition: transform 0.4s var(--ease-out);
+  }
+  .faq__contact a:hover :global(.faq__go) {
+    transform: translate(3px, -3px);
+    color: var(--ink);
+  }
+
+  .faq__list {
+    border-top: 1px solid var(--line-strong);
+  }
+  .faq__item {
+    border-bottom: 1px solid var(--line-strong);
+  }
+  .faq__item summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.6rem 0;
+    cursor: pointer;
+    list-style: none;
+  }
+  .faq__item summary::-webkit-details-marker {
+    display: none;
+  }
+  .faq__q {
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 1.15rem + 0.9vw, 2rem);
+    line-height: 1.15;
+    transition: transform 0.5s var(--ease-out);
+  }
+  .faq__item summary:hover .faq__q {
+    transform: translateX(6px);
+  }
+  .faq__toggle {
+    position: relative;
+    flex: none;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    transition:
+      background-color 0.35s,
+      transform 0.5s var(--ease-out);
+  }
+  .faq__toggle::before,
+  .faq__toggle::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 12px;
+    height: 1.5px;
+    background: currentColor;
+    translate: -50% -50%;
+    transition: transform 0.5s var(--ease-out);
+  }
+  .faq__toggle::after {
+    transform: rotate(90deg);
+  }
+  .faq__item[open] .faq__toggle {
+    background: var(--ink);
+    color: var(--cream);
+    transform: rotate(180deg);
+  }
+  .faq__item[open] .faq__toggle::after {
+    transform: rotate(0deg);
+  }
+  .faq__a {
+    padding: 0 3.5rem 1.8rem 0;
+    color: var(--ink-3);
+    max-width: 60ch;
+  }
+  .faq__item[open] .faq__a {
+    animation: faq-open 0.6s var(--ease-out);
+  }
+  @keyframes faq-open {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+  }
+  @media (max-width: 900px) {
+    .faq__grid {
+      grid-template-columns: 1fr;
+    }
+    .faq__list {
+      order: 2;
+    }
+    .faq__contact {
+      margin-top: 0;
+    }
+  }
+</style>
