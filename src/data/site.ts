@@ -6,7 +6,6 @@
 export const site = {
   name: "Hovato",
   legalName: "Hovato Hospitality", // TODO: confirm the registered business name
-  descriptor: "Bespoke Hospitality",
   tagline: "Where better stays create greater value",
   region: "Kochi, Kerala",
   description:
